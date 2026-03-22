@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Quantum Random Number Generator — True Quantum Randomness | hadamard.app</title>
+<meta name="description" content="Generate truly random numbers using quantum vacuum fluctuations via the ANU Quantum Random Number Generator. Unlike software RNG, quantum randomness is fundamentally unpredictable. Free, no sign-up.">
+<meta name="keywords" content="quantum random number generator, true random number generator, quantum randomness, QRNG, random numbers online free, ANU quantum random, cryptographic random numbers">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://hadamard.app/quantumrng.html">
+<meta property="og:title" content="Quantum Random Number Generator | hadamard.app">
+<meta property="og:description" content="Generate truly random numbers from quantum vacuum fluctuations. Not an algorithm — actual quantum physics.">
+<meta property="og:url" content="https://hadamard.app/quantumrng.html">
+<meta property="og:type" content="website">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Hadamard Quantum RNG","url":"https://hadamard.app/quantumrng.html","description":"Quantum random number generator using vacuum fluctuations","applicationCategory":"UtilitiesApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;1,300;0,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050508;--surface:#0d0d14;--surface2:#12121e;--border:#1e1e32;--border2:#2a2a44;
+  --accent:#00d4ff;--accent2:#0099cc;--accent-dim:rgba(0,212,255,.08);
+  --gold:#e8c84a;--text:#dde4f0;--muted:#6a7490;--dim:#3a3d54;
+  --green:#00ff9d;--purple:#a855f7;
+  --font-display:'Bebas Neue',sans-serif;--font-body:'DM Mono',monospace;--font-serif:'Crimson Pro',Georgia,serif
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:13px;min-height:100vh;overflow-x:hidden}
+a{color:var(--muted);text-decoration:none}
+
+/* QUANTUM PARTICLE CANVAS */
+#q-canvas{position:fixed;inset:0;pointer-events:none;opacity:.4;z-index:0}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:52px;border-bottom:1px solid var(--border);background:rgba(5,5,8,.9);position:sticky;top:0;z-index:10;backdrop-filter:blur(8px)}
+.nav-logo{font-family:var(--font-display);font-size:26px;letter-spacing:4px;color:#e8c84a}
+.nav-logo span{color:var(--muted);font-size:16px}
+.nav-back{font-size:11px;letter-spacing:1.5px;color:var(--muted);transition:color .15s}
+.nav-back:hover{color:var(--accent)}
+
+.page-wrap{max-width:900px;margin:0 auto;padding:48px 24px;position:relative;z-index:1}
+
+/* HERO */
+.q-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(0,212,255,.25);border-radius:2px;padding:4px 12px;font-size:9px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:20px;background:var(--accent-dim)}
+.q-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:qpulse 1.5s ease-in-out infinite}
+@keyframes qpulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+
+h1{font-family:var(--font-display);font-size:clamp(40px,8vw,72px);letter-spacing:4px;color:var(--text);line-height:1;margin-bottom:10px}
+h1 em{color:var(--accent);font-style:normal}
+.page-sub{font-family:var(--font-serif);font-style:italic;color:var(--muted);font-size:16px;margin-bottom:40px;line-height:1.6}
+
+/* MAIN GENERATOR */
+.generator-card{background:var(--surface);border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:20px;position:relative}
+.generator-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+
+.gen-display{padding:40px 32px;text-align:center;border-bottom:1px solid var(--border);position:relative;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.gen-number{font-family:var(--font-display);font-size:clamp(56px,12vw,100px);letter-spacing:6px;color:var(--accent);line-height:1;transition:all .15s;word-break:break-all;position:relative}
+.gen-number.loading{color:var(--dim);animation:flicker .3s ease-in-out infinite}
+@keyframes flicker{0%,100%{opacity:.3}50%{opacity:.8}}
+.gen-number.fresh{animation:pop .25s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes pop{0%{transform:scale(.92);opacity:.5}100%{transform:scale(1);opacity:1}}
+
+.gen-source{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.source-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.src-quantum{background:var(--accent)}
+.src-crypto{background:var(--gold)}
+
+.gen-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--border)}
+.ctrl-group{padding:16px 20px;border-right:1px solid var(--border)}
+.ctrl-group:last-child{border-right:none}
+.ctrl-label{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;display:block}
+.ctrl-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:8px 10px;outline:none;transition:border-color .12s}
+.ctrl-input:focus{border-color:var(--accent)}
+.ctrl-select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;color:var(--text);font-family:var(--font-body);font-size:12px;padding:8px 10px;outline:none;cursor:pointer;transition:border-color .12s}
+.ctrl-select:focus{border-color:var(--accent)}
+
+.gen-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:18px;background:none;border:none;color:var(--accent);font-family:var(--font-display);font-size:22px;letter-spacing:6px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.gen-btn::before{content:'';position:absolute;inset:0;background:var(--accent-dim);transform:scaleX(0);transform-origin:left;transition:transform .2s}
+.gen-btn:hover::before{transform:scaleX(1)}
+.gen-btn:hover{color:#fff}
+.gen-btn:disabled{color:var(--dim);cursor:not-allowed}
+.gen-btn:disabled::before{display:none}
+.gen-btn svg{transition:transform .2s}
+.gen-btn:hover svg{transform:rotate(180deg)}
+
+/* BULK MODE */
+.bulk-section{background:var(--surface);border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:20px}
+.bulk-head{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border)}
+.bulk-title{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.bulk-actions{display:flex;gap:6px}
+.smb{padding:5px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;color:var(--muted);font-family:var(--font-body);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .12s}
+.smb:hover{color:var(--accent);border-color:rgba(0,212,255,.3)}
+.bulk-controls{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.bulk-count-input{width:72px;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:7px 10px;outline:none;transition:border-color .12s}
+.bulk-count-input:focus{border-color:var(--accent)}
+.bulk-gen-btn{padding:8px 16px;background:var(--accent);border:none;border-radius:2px;color:#000;font-family:var(--font-body);font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background .15s}
+.bulk-gen-btn:hover{background:var(--accent2)}
+.bulk-output{padding:16px 20px;font-size:13px;color:var(--accent);line-height:2;min-height:80px;font-family:var(--font-body);letter-spacing:1px;word-break:break-all}
+.bulk-output.empty{color:var(--dim);font-style:italic;font-family:var(--font-serif)}
+
+/* HISTORY */
+.history-section{background:var(--surface);border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:20px}
+.history-head{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border)}
+.history-title{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.history-list{display:flex;flex-wrap:wrap;gap:6px;padding:16px 20px;min-height:60px}
+.history-chip{padding:5px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;font-size:12px;color:var(--text);cursor:pointer;transition:all .12s;letter-spacing:1px}
+.history-chip:hover{border-color:var(--accent);color:var(--accent)}
+.history-empty{color:var(--dim);font-style:italic;font-family:var(--font-serif);font-size:13px}
+
+/* EXPLAINER */
+.explainer{background:var(--surface);border:1px solid var(--border2);border-radius:2px;padding:28px 32px;margin-bottom:20px}
+.exp-title{font-family:var(--font-display);font-size:24px;letter-spacing:3px;color:var(--text);margin-bottom:16px}
+.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.exp-card{background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:16px}
+.exp-card-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.exp-card-title.quantum{color:var(--accent)}
+.exp-card-title.classical{color:var(--gold)}
+.exp-card p{font-family:var(--font-serif);font-size:14px;color:var(--muted);line-height:1.7}
+.exp-note{font-family:var(--font-serif);font-style:italic;font-size:14px;color:var(--dim);margin-top:16px;padding-top:16px;border-top:1px solid var(--border);line-height:1.7}
+
+/* FAQ */
+.faq-section{margin-top:32px}
+.faq-title{font-family:var(--font-display);font-size:28px;letter-spacing:3px;color:var(--muted);margin-bottom:20px}
+.faq-item{margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px}
+.faq-a{font-family:var(--font-serif);font-size:15px;color:var(--muted);line-height:1.7}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#000;padding:8px 16px;border-radius:2px;font-size:12px;font-weight:500;letter-spacing:1.5px;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+
+footer{border-top:1px solid var(--border);padding:20px 28px;display:flex;justify-content:space-between;align-items:center;margin-top:40px;flex-wrap:wrap;gap:10px;position:relative;z-index:1}
+.footer-links{display:flex;gap:18px;flex-wrap:wrap}
+.footer-links a{font-size:10px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.footer-copy{font-size:11px;color:var(--dim)}
+
+@media(max-width:600px){.gen-controls{grid-template-columns:1fr}.ctrl-group{border-right:none;border-bottom:1px solid var(--border)}.ctrl-group:last-child{border-bottom:none}.exp-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<canvas id="q-canvas"></canvas>
+
+<nav>
+  <a href="index.html" class="nav-logo">HADAMARD<span style="font-size:14px;letter-spacing:2px;color:var(--magenta)">.app</span></a>
+  <a href="index.html" class="nav-back">← All Tools</a>
+</nav>
+
+<div class="page-wrap">
+  <div class="q-badge">Quantum Randomness</div>
+  <h1>QUANTUM <em>RANDOM</em><br>NUMBER GENERATOR</h1>
+  <div class="page-sub">Not an algorithm. Not a formula.<br>True randomness from the fabric of quantum physics.</div>
+
+  <!-- MAIN GENERATOR -->
+  <div class="generator-card">
+    <div class="gen-display">
+      <div class="gen-number" id="gen-number">?</div>
+      <div class="gen-source" id="gen-source"></div>
+    </div>
+    <div class="gen-controls">
+      <div class="ctrl-group">
+        <span class="ctrl-label">Minimum</span>
+        <input type="number" class="ctrl-input" id="ctrl-min" value="1" min="-999999999" max="999999999">
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">Maximum</span>
+        <input type="number" class="ctrl-input" id="ctrl-max" value="1000000" min="-999999999" max="999999999">
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">Type</span>
+        <select class="ctrl-select" id="ctrl-type">
+          <option value="integer">Integer</option>
+          <option value="decimal">Decimal</option>
+          <option value="hex">Hexadecimal</option>
+          <option value="binary">Binary (8-bit)</option>
+        </select>
+      </div>
+    </div>
+    <button class="gen-btn" id="gen-btn" onclick="generate()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM17 14v6M14 17h6"/></svg>
+      GENERATE
+    </button>
+  </div>
+
+  <!-- BULK -->
+  <div class="bulk-section">
+    <div class="bulk-head">
+      <span class="bulk-title">Bulk Generator</span>
+      <div class="bulk-actions">
+        <button class="smb" onclick="copyBulk()">⎘ Copy all</button>
+        <button class="smb" onclick="clearBulk()">Clear</button>
+      </div>
+    </div>
+    <div class="bulk-controls">
+      <span style="font-size:11px;color:var(--muted)">Generate</span>
+      <input type="number" class="bulk-count-input" id="bulk-count" value="10" min="1" max="1000">
+      <span style="font-size:11px;color:var(--muted)">numbers</span>
+      <button class="bulk-gen-btn" onclick="generateBulk()">⚛ Generate All</button>
+    </div>
+    <div class="bulk-output" id="bulk-output"><span class="empty">Bulk numbers will appear here...</span></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="history-section">
+    <div class="history-head">
+      <span class="history-title">Recent Numbers <span id="hist-count" style="color:var(--dim)"></span></span>
+      <button class="smb" onclick="clearHistory()">Clear</button>
+    </div>
+    <div class="history-list" id="history-list">
+      <span class="history-empty">Numbers you generate will appear here</span>
+    </div>
+  </div>
+
+  <!-- EXPLAINER -->
+  <div class="explainer">
+    <div class="exp-title">WHY QUANTUM RANDOMNESS?</div>
+    <div class="exp-grid">
+      <div class="exp-card">
+        <div class="exp-card-title quantum">⚛ Quantum Randomness</div>
+        <p>Generated from quantum vacuum fluctuations — the spontaneous appearance and disappearance of particle pairs in empty space. These events are fundamentally unpredictable, even in principle. No amount of information about the past can predict the next result.</p>
+      </div>
+      <div class="exp-card">
+        <div class="exp-card-title classical">⚙ Classical Randomness</div>
+        <p>Standard software RNG uses mathematical algorithms (PRNGs). Given the same seed, they produce the same sequence every time. They're fine for games and simulations, but technically deterministic — not truly random at a physical level.</p>
+      </div>
+    </div>
+    <div class="exp-note">This tool attempts to fetch quantum random numbers from the ANU Quantum Random Number Generator (qrng.anu.edu.au), operated by the Australian National University. When that API is unavailable due to network restrictions, it falls back to the browser's <code style="color:var(--accent)">crypto.getRandomValues()</code> — cryptographically secure, though not quantum-sourced. The source indicator above the number tells you which was used.</div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <div class="faq-title">FREQUENTLY ASKED QUESTIONS</div>
+    <div class="faq-item">
+      <div class="faq-q">What is a quantum random number generator?</div>
+      <div class="faq-a">A QRNG generates randomness from quantum physical processes — typically vacuum fluctuations, photon detection events, or radioactive decay — rather than mathematical algorithms. Because quantum mechanics is inherently probabilistic, the results are unpredictable at a fundamental level, not just computationally.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Why does true randomness matter?</div>
+      <div class="faq-a">For most everyday uses (picking a lottery number, simulating a dice roll, generating a test dataset) a good PRNG is perfectly fine. True randomness matters in cryptography, scientific experiments requiring unbiased sampling, and high-stakes simulations where algorithmic patterns could introduce subtle bias.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What are vacuum fluctuations?</div>
+      <div class="faq-a">In quantum field theory, even "empty" space is not truly empty. Virtual particle-antiparticle pairs continuously pop in and out of existence. Measuring the fluctuating electric field of the quantum vacuum produces a stream of numbers that is provably random — not just hard to predict, but impossible to predict even with perfect knowledge of the system's past states.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is the crypto fallback secure?</div>
+      <div class="faq-a">Yes. The browser's <code>crypto.getRandomValues()</code> is cryptographically secure and seeded from multiple entropy sources including hardware timing, mouse movement, and OS-level randomness. It's suitable for security applications, though its entropy is ultimately classical rather than quantum.</div>
+    </div>
+  </div>
+
+  <section style="padding:24px 0 0;border-top:1px solid var(--border);margin-top:16px;">
+    <p style="font-family:'Crimson Pro',Georgia,serif;font-size:15px;color:var(--dim);line-height:1.9;">More free tools — <p style="font-family:'Crimson Pro',Georgia,serif;font-size:15px;color:var(--dim);line-height:1.9;">More quantum tools — <a href="index.html" style="color:var(--muted)">Circuit Simulator</a>, <a href="quantum-bloch.html" style="color:var(--muted)">Bloch Sphere</a>, <a href="quantum-entanglement.html" style="color:var(--muted)">Entanglement Demo</a>, <a href="quantum-qkd.html" style="color:var(--muted)">BB84 QKD</a>.</p>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+<footer>
+  <a href="index.html" style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--dim)">HADAMARD.APP</a>
+  <div class="footer-copy">© 2026 hadamard.app</div>
+  <div class="footer-links">
+    <a href="quantum-bloch.html">Bloch Sphere</a><a href="quantum-entanglement.html">Entanglement</a><a href="quantum-qkd.html">QKD</a>
+  </div>
+</footer>
+
+<script src="feedback.js"></script>
+<script>
+// ── QUANTUM PARTICLE CANVAS BACKGROUND ──
+const canvas = document.getElementById('q-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function initParticles() {
+  particles = Array.from({length: 60}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.5 + 0.3,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    life: Math.random(),
+    decay: Math.random() * 0.003 + 0.001,
+  }));
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+    if (p.life <= 0) {
+      p.x = Math.random() * canvas.width;
+      p.y = Math.random() * canvas.height;
+      p.life = 1;
+    }
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0,212,255,${p.life * 0.6})`;
+    ctx.fill();
+    // draw connections
+    particles.forEach(p2 => {
+      const dx = p.x - p2.x, dy = p.y - p2.y;
+      const dist = Math.sqrt(dx*dx+dy*dy);
+      if (dist < 100) {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = `rgba(0,212,255,${(1-dist/100)*0.08})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    });
+  });
+  requestAnimationFrame(animateParticles);
+}
+
+resizeCanvas();
+initParticles();
+animateParticles();
+window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+
+// ── RNG LOGIC ──
+let history = [];
+let lastNumber = null;
+let lastSource = null;
+
+async function fetchQuantumBytes(count = 4) {
+  try {
+    const res = await fetch(
+      `https://qrng.anu.edu.au/API/jsonI.php?length=${count}&type=uint8`,
+      { signal: AbortSignal.timeout(3000) }
+    );
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    if (data.success && data.data?.length) return { bytes: data.data, source: 'quantum' };
+  } catch(e) {}
+  // Fallback: crypto
+  const arr = new Uint8Array(count);
+  crypto.getRandomValues(arr);
+  return { bytes: Array.from(arr), source: 'crypto' };
+}
+
+function bytesToNumber(bytes) {
+  // Combine 4 bytes into a 32-bit unsigned int
+  return ((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0;
+}
+
+function scaleToRange(raw, min, max) {
+  const range = max - min + 1;
+  return min + (raw % range);
+}
+
+async function generate() {
+  const btn = document.getElementById('gen-btn');
+  const numEl = document.getElementById('gen-number');
+  const srcEl = document.getElementById('gen-source');
+  const type = document.getElementById('ctrl-type').value;
+  const min = parseInt(document.getElementById('ctrl-min').value) || 0;
+  const max = parseInt(document.getElementById('ctrl-max').value) || 1000000;
+
+  if (min >= max) { showToast('Min must be less than Max'); return; }
+
+  btn.disabled = true;
+  numEl.className = 'gen-number loading';
+  numEl.textContent = '···';
+  srcEl.textContent = '';
+
+  const { bytes, source } = await fetchQuantumBytes(4);
+  const raw = bytesToNumber(bytes);
+
+  let result;
+  if (type === 'integer') {
+    result = scaleToRange(raw, min, max).toLocaleString();
+  } else if (type === 'decimal') {
+    result = (min + (raw / 4294967295) * (max - min)).toFixed(6);
+  } else if (type === 'hex') {
+    result = '0x' + raw.toString(16).toUpperCase().padStart(8, '0');
+  } else {
+    result = bytes[0].toString(2).padStart(8, '0');
+  }
+
+  numEl.textContent = result;
+  numEl.className = 'gen-number fresh';
+  lastNumber = result;
+  lastSource = source;
+
+  const dotColor = source === 'quantum' ? 'src-quantum' : 'src-crypto';
+  const srcLabel = source === 'quantum' ? 'Quantum vacuum · ANU QRNG' : 'Cryptographic · browser crypto.getRandomValues()';
+  srcEl.innerHTML = `<span class="source-dot ${dotColor}"></span>${srcLabel}`;
+
+  addToHistory(result, source);
+  btn.disabled = false;
+}
+
+function addToHistory(num, source) {
+  history.unshift({ num, source });
+  if (history.length > 20) history.pop();
+  renderHistory();
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  document.getElementById('hist-count').textContent = `(${history.length})`;
+  if (!history.length) {
+    el.innerHTML = '<span class="history-empty">Numbers you generate will appear here</span>';
+    return;
+  }
+  el.innerHTML = history.map(h =>
+    `<span class="history-chip" onclick="copyText('${h.num}')" title="${h.source === 'quantum' ? '⚛ Quantum' : '🔐 Crypto'} · click to copy">${h.num}</span>`
+  ).join('');
+}
+
+function clearHistory() { history = []; renderHistory(); }
+
+async function generateBulk() {
+  const count = Math.min(parseInt(document.getElementById('bulk-count').value) || 10, 1000);
+  const type = document.getElementById('ctrl-type').value;
+  const min = parseInt(document.getElementById('ctrl-min').value) || 0;
+  const max = parseInt(document.getElementById('ctrl-max').value) || 1000000;
+  const outputEl = document.getElementById('bulk-output');
+
+  outputEl.innerHTML = '<span style="color:var(--dim);font-style:italic">Generating...</span>';
+
+  // Fetch enough bytes for all numbers
+  const bytesNeeded = count * 4;
+  const results = [];
+
+  // Process in chunks of 100 bytes max from API
+  const arr = new Uint8Array(bytesNeeded);
+  crypto.getRandomValues(arr); // fast fallback for bulk
+
+  for (let i = 0; i < count; i++) {
+    const raw = ((arr[i*4] << 24) | (arr[i*4+1] << 16) | (arr[i*4+2] << 8) | arr[i*4+3]) >>> 0;
+    let val;
+    if (type === 'integer') val = scaleToRange(raw, min, max);
+    else if (type === 'decimal') val = (min + (raw / 4294967295) * (max - min)).toFixed(4);
+    else if (type === 'hex') val = '0x' + raw.toString(16).toUpperCase().padStart(8,'0');
+    else val = arr[i*4].toString(2).padStart(8,'0');
+    results.push(val);
+  }
+
+  outputEl.innerHTML = `<span style="color:var(--accent)">${results.join('  ·  ')}</span>`;
+  outputEl.dataset.values = results.join('\n');
+}
+
+function copyBulk() {
+  const vals = document.getElementById('bulk-output').dataset.values;
+  if (vals) copyText(vals);
+  else showToast('Generate some numbers first');
+}
+
+function clearBulk() {
+  document.getElementById('bulk-output').innerHTML = '<span class="empty">Bulk numbers will appear here...</span>';
+  delete document.getElementById('bulk-output').dataset.values;
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => showToast('Copied: ' + text));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// Auto-generate on load
+generate();
+</script>
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Entanglement Demo — Bell Pairs | Hadamard</title>
+<meta name="description" content="Interactive quantum entanglement demonstration. Create Bell pairs, send qubits across the universe, measure them and see perfect correlations. Understand spooky action at a distance.">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Orbitron:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#02020a;--surface:#080814;--surface2:#0e0e1e;--border:#1a1a30;--border2:#242440;--cyan:#00e5ff;--cyan-dim:rgba(0,229,255,.08);--magenta:#ff00aa;--mag-dim:rgba(255,0,170,.06);--green:#00ff9d;--gold:#e8c84a;--white:#e8f0ff;--muted:#5a6080;--dim:#2a2d40;--font-display:'Orbitron',monospace;--font-body:'DM Mono',monospace;--font-serif:'Crimson Pro',Georgia,serif}
+body{background:var(--bg);color:var(--white);font-family:var(--font-body);font-size:13px;min-height:100vh}
+a{color:var(--muted);text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;border-bottom:1px solid var(--border);background:rgba(2,2,10,.92);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+.nav-logo{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-shadow:0 0 16px rgba(0,229,255,.4)}
+.nav-logo span{color:var(--magenta)}
+.nav-back{font-size:10px;letter-spacing:1.5px;color:var(--muted);border:1px solid var(--border2);padding:5px 10px;border-radius:2px;transition:all .15s}
+.nav-back:hover{color:var(--cyan);border-color:var(--cyan)}
+.page-wrap{max-width:1000px;margin:0 auto;padding:40px 24px}
+.page-head{margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.page-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,0,170,.3);border-radius:2px;padding:3px 10px;font-size:9px;letter-spacing:3px;color:var(--magenta);text-transform:uppercase;margin-bottom:12px;background:var(--mag-dim)}
+h1{font-family:var(--font-display);font-size:clamp(28px,5vw,48px);font-weight:900;letter-spacing:2px;color:var(--white);line-height:1;margin-bottom:8px}
+h1 em{color:var(--magenta);font-style:normal}
+.page-sub{font-family:var(--font-serif);font-style:italic;color:var(--muted);font-size:15px;line-height:1.6}
+
+/* SCENE */
+.scene-card{background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:20px;position:relative}
+.scene-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--magenta),var(--cyan))}
+#ent-canvas{display:block;width:100%;height:280px}
+.scene-caption{padding:10px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--dim);letter-spacing:.5px;text-align:center;font-family:var(--font-serif);font-style:italic}
+
+/* STEPS */
+.steps-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.step-card{background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow:hidden;opacity:.5;transition:opacity .3s,border-color .3s}
+.step-card.active{opacity:1;border-color:var(--cyan)}
+.step-card.done{opacity:.8;border-color:var(--green)}
+.step-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:11px;color:var(--muted);flex-shrink:0}
+.step-card.active .step-num{background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan)}
+.step-card.done .step-num{background:rgba(0,255,157,.1);border-color:var(--green);color:var(--green)}
+.step-title{font-family:var(--font-display);font-size:12px;letter-spacing:1.5px;color:var(--muted)}
+.step-card.active .step-title{color:var(--white)}
+.step-body{padding:14px 16px}
+.step-desc{font-family:var(--font-serif);font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+
+/* BUTTONS */
+.step-btn{width:100%;padding:10px;background:var(--cyan);border:none;border-radius:2px;color:#000;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.step-btn:hover{background:#fff}
+.step-btn:disabled{background:var(--surface2);color:var(--dim);cursor:not-allowed}
+.step-btn.mag{background:var(--magenta)}
+.step-btn.mag:hover{background:#ff66cc}
+.step-btn.green{background:var(--green);color:#000}
+.step-btn.green:hover{background:#66ffcc}
+
+/* MEASUREMENT DISPLAY */
+.measurement-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.meas-card{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:20px;text-align:center;position:relative;overflow:hidden;transition:all .3s}
+.meas-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .4s}
+.meas-card.result-0::before{background:radial-gradient(ellipse,rgba(0,229,255,.08),transparent);opacity:1}
+.meas-card.result-1::before{background:radial-gradient(ellipse,rgba(255,0,170,.08),transparent);opacity:1}
+.mc-location{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.mc-qubit{font-family:var(--font-display);font-size:11px;letter-spacing:2px;color:var(--muted);margin-bottom:16px}
+.mc-result{font-family:var(--font-display);font-size:64px;font-weight:900;line-height:1;transition:all .3s}
+.mc-result.spin-up{color:var(--cyan);text-shadow:0 0 30px rgba(0,229,255,.5)}
+.mc-result.spin-down{color:var(--magenta);text-shadow:0 0 30px rgba(255,0,170,.5)}
+.mc-result.unknown{color:var(--dim);font-size:40px}
+.mc-label{font-size:11px;color:var(--muted);margin-top:8px;letter-spacing:1px}
+.mc-dist{font-size:10px;color:var(--dim);margin-top:4px}
+
+/* CORRELATION */
+.correlation-card{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:20px;margin-bottom:20px}
+.corr-title{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:16px}
+.corr-bar-wrap{height:12px;background:var(--surface2);border-radius:2px;overflow:hidden;border:1px solid var(--border);margin-bottom:8px}
+.corr-bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width .4s ease;border-radius:2px}
+.corr-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.cs-item{background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:8px;text-align:center}
+.cs-label{font-size:9px;letter-spacing:1px;color:var(--dim);text-transform:uppercase;margin-bottom:3px}
+.cs-val{font-size:15px;font-weight:500;color:var(--white)}
+
+/* BELL SELECTOR */
+.bell-selector{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.bell-btn{padding:10px 8px;background:var(--surface);border:1px solid var(--border2);border-radius:3px;color:var(--muted);font-family:var(--font-body);font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .12s;text-align:center}
+.bell-btn:hover,.bell-btn.active{border-color:var(--magenta);color:var(--magenta);background:var(--mag-dim)}
+.bell-btn .bell-state{font-family:var(--font-display);font-size:14px;margin-bottom:4px}
+
+.info-card{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:20px;margin-bottom:16px}
+.info-title{font-family:var(--font-display);font-size:14px;letter-spacing:2px;color:var(--cyan);margin-bottom:10px}
+.info-body{font-family:var(--font-serif);font-size:14px;color:var(--muted);line-height:1.8}
+.info-body code{color:var(--cyan);font-family:var(--font-body);font-size:12px}
+
+.faq-section{margin-top:32px;border-top:1px solid var(--border);padding-top:28px}
+.faq-title{font-family:var(--font-display);font-size:20px;letter-spacing:3px;color:var(--muted);margin-bottom:16px}
+.faq-item{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{font-size:13px;font-weight:500;color:var(--white);margin-bottom:5px}
+.faq-a{font-family:var(--font-serif);font-size:14px;color:var(--muted);line-height:1.7}
+footer{border-top:1px solid var(--border);padding:20px 28px;display:flex;justify-content:space-between;align-items:center;margin-top:32px;flex-wrap:wrap;gap:10px}
+.footer-copy{font-size:11px;color:var(--dim)}
+.footer-links{display:flex;gap:16px}
+.footer-links a{font-size:10px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;transition:color .15s}
+.footer-links a:hover{color:var(--cyan)}
+@media(max-width:640px){.steps-wrap,.measurement-grid,.corr-stats,.bell-selector{grid-template-columns:1fr 1fr}.bell-selector{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">HADAMARD<span style="font-size:14px;letter-spacing:2px;color:var(--magenta)">.app</span></a>
+  <a href="index.html" class="nav-back">← All Tools</a>
+</nav>
+<div class="page-wrap">
+  <div class="page-head">
+    <div class="page-badge">🔗 Entanglement</div>
+    <h1>QUANTUM <em>ENTANGLEMENT</em></h1>
+    <div class="page-sub">Einstein called it "spooky action at a distance." Create a Bell pair, separate the qubits by any distance, measure one — the other instantly reveals its correlated state. Watch it happen.</div>
+  </div>
+
+  <!-- ANIMATION CANVAS -->
+  <div class="scene-card">
+    <canvas id="ent-canvas"></canvas>
+    <div class="scene-caption" id="scene-caption">Select a Bell state and press Create Entangled Pair to begin</div>
+  </div>
+
+  <!-- BELL STATE SELECTOR -->
+  <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Select Bell State</div>
+  <div class="bell-selector">
+    <button class="bell-btn active" id="bell-Φ+" onclick="selectBell('Φ+',this)"><div class="bell-state">Φ⁺</div>|00⟩+|11⟩</button>
+    <button class="bell-btn" id="bell-Φ-" onclick="selectBell('Φ-',this)"><div class="bell-state">Φ⁻</div>|00⟩−|11⟩</button>
+    <button class="bell-btn" id="bell-Ψ+" onclick="selectBell('Ψ+',this)"><div class="bell-state">Ψ⁺</div>|01⟩+|10⟩</button>
+    <button class="bell-btn" id="bell-Ψ-" onclick="selectBell('Ψ-',this)"><div class="bell-state">Ψ⁻</div>|01⟩−|10⟩</button>
+  </div>
+
+  <!-- STEPS -->
+  <div class="steps-wrap">
+    <div class="step-card active" id="step1">
+      <div class="step-head"><div class="step-num">1</div><div class="step-title">CREATE PAIR</div></div>
+      <div class="step-body">
+        <div class="step-desc">A quantum computer applies a Hadamard gate followed by a CNOT gate to create a maximally entangled Bell state — a superposition of both qubits simultaneously.</div>
+        <button class="step-btn" id="btn-create" onclick="createPair()">⚛ Create Entangled Pair</button>
+      </div>
+    </div>
+    <div class="step-card" id="step2">
+      <div class="step-head"><div class="step-num">2</div><div class="step-title">SEPARATE QUBITS</div></div>
+      <div class="step-body">
+        <div class="step-desc">Alice takes qubit A. Bob takes qubit B. They travel to opposite sides of the universe. The entanglement persists regardless of distance.</div>
+        <button class="step-btn mag" id="btn-separate" onclick="separateQubits()" disabled>🚀 Send to Opposite Ends</button>
+      </div>
+    </div>
+    <div class="step-card" id="step3">
+      <div class="step-head"><div class="step-num">3</div><div class="step-title">ALICE MEASURES</div></div>
+      <div class="step-body">
+        <div class="step-desc">Alice measures her qubit. The result is truly random — 50% chance of |0⟩, 50% chance of |1⟩. At this moment, Bob's qubit collapses too.</div>
+        <button class="step-btn" id="btn-alice" onclick="aliceMeasure()" disabled>⊛ Alice Measures</button>
+      </div>
+    </div>
+    <div class="step-card" id="step4">
+      <div class="step-head"><div class="step-num">4</div><div class="step-title">BOB MEASURES</div></div>
+      <div class="step-body">
+        <div class="step-desc">Bob measures his qubit. Despite being separated by vast distance, the outcomes are perfectly correlated — guaranteed by quantum mechanics.</div>
+        <button class="step-btn green" id="btn-bob" onclick="bobMeasure()" disabled>⊛ Bob Measures</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEASUREMENTS -->
+  <div class="measurement-grid">
+    <div class="meas-card" id="alice-card">
+      <div class="mc-location">🌍 Alice's Lab</div>
+      <div class="mc-qubit">Qubit A</div>
+      <div class="mc-result unknown" id="alice-result">?</div>
+      <div class="mc-label" id="alice-label">Not yet measured</div>
+      <div class="mc-dist" id="alice-dist"></div>
+    </div>
+    <div class="meas-card" id="bob-card">
+      <div class="mc-location">🌌 Bob's Station</div>
+      <div class="mc-qubit">Qubit B</div>
+      <div class="mc-result unknown" id="bob-result">?</div>
+      <div class="mc-label" id="bob-label">Not yet measured</div>
+      <div class="mc-dist" id="bob-dist"></div>
+    </div>
+  </div>
+
+  <!-- CORRELATION STATS -->
+  <div class="correlation-card">
+    <div class="corr-title">Correlation Statistics — Run many experiments to see quantum theory in action</div>
+    <div class="corr-bar-wrap"><div class="corr-bar" id="corr-bar" style="width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-bottom:8px">
+      <span>Correlation: <span id="corr-pct" style="color:var(--cyan)">—</span></span>
+      <span>Quantum prediction: 100% (for Φ⁺/Φ⁻) or anti-correlated (for Ψ⁺/Ψ⁻)</span>
+    </div>
+    <div class="corr-stats">
+      <div class="cs-item"><div class="cs-label">Total runs</div><div class="cs-val" id="stat-total">0</div></div>
+      <div class="cs-item"><div class="cs-label">Correlated</div><div class="cs-val" id="stat-corr" style="color:var(--green)">0</div></div>
+      <div class="cs-item"><div class="cs-label">Anti-correlated</div><div class="cs-val" id="stat-anti" style="color:var(--magenta)">0</div></div>
+      <div class="cs-item"><div class="cs-label">Correlation %</div><div class="cs-val" id="stat-pct" style="color:var(--cyan)">—</div></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button style="padding:7px 14px;background:none;border:1px solid var(--border2);border-radius:2px;color:var(--muted);font-family:var(--font-body);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .12s" onmouseover="this.style.borderColor='var(--cyan)';this.style.color='var(--cyan)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted)'" onclick="runMany(10)">Run 10×</button>
+      <button style="padding:7px 14px;background:none;border:1px solid var(--border2);border-radius:2px;color:var(--muted);font-family:var(--font-body);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .12s" onmouseover="this.style.borderColor='var(--cyan)';this.style.color='var(--cyan)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted)'" onclick="runMany(100)">Run 100×</button>
+      <button style="padding:7px 14px;background:none;border:1px solid var(--border2);border-radius:2px;color:var(--muted);font-family:var(--font-body);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .12s" onmouseover="this.style.borderColor='var(--magenta)';this.style.color='var(--magenta)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted)'" onclick="resetStats()">Reset Stats</button>
+    </div>
+  </div>
+
+  <!-- INFO -->
+  <div class="info-card">
+    <div class="info-title">WHAT'S ACTUALLY HAPPENING</div>
+    <div class="info-body" id="info-body">The Bell state Φ⁺ is written as <code>(1/√2)(|00⟩ + |11⟩)</code>. This means the two-qubit system exists in a superposition of both being |0⟩ and both being |1⟩ simultaneously — neither qubit has a definite state until measured. When Alice measures, the wavefunction collapses: if she gets |0⟩, Bob's qubit instantly becomes |0⟩ too. If she gets |1⟩, so does Bob. This correlation is stronger than anything classical physics allows.</div>
+  </div>
+
+  <div class="faq-section">
+    <div class="faq-title">THE PHYSICS</div>
+    <div class="faq-item">
+      <div class="faq-q">Does this allow faster-than-light communication?</div>
+      <div class="faq-a">No — and this is crucial. Alice's measurement result is random. She can't control whether she gets |0⟩ or |1⟩. Bob also gets a random result. They can only discover the correlation after comparing notes through a classical channel. The correlation is real, but it can't carry information faster than light.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What makes the four Bell states different?</div>
+      <div class="faq-a">The four Bell states differ in their correlation pattern. Φ⁺ = (|00⟩+|11⟩)/√2 and Φ⁻ = (|00⟩−|11⟩)/√2 give same-same correlations (both 0 or both 1). Ψ⁺ = (|01⟩+|10⟩)/√2 and Ψ⁻ = (|01⟩−|10⟩)/√2 give opposite correlations (one gets 0, other gets 1). The minus signs create relative phases between the superposition terms.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What is Bell's theorem?</div>
+      <div class="faq-a">John Bell proved in 1964 that no "hidden variable" theory — no classical explanation where the qubits secretly carried predetermined answers — could reproduce the statistical correlations of quantum entanglement. Experiments (most recently the 2022 Nobel Prize work by Aspect, Clauser, and Zeilinger) have conclusively confirmed these quantum correlations violate Bell's inequalities, ruling out classical hidden variables.</div>
+    </div>
+  </div>
+</div>
+<footer>
+  <a href="index.html" style="font-family:var(--font-display);font-size:14px;letter-spacing:3px;color:var(--dim)">HADAMARD<span style="font-size:11px;color:var(--magenta)">.app</span</a>
+  <div class="footer-copy">© 2026 hadamard.app</div>
+  <div class="footer-links"><a href="index.html">Home</a><a href="quantum-bloch.html">Bloch Sphere</a><a href="quantum-qkd.html">QKD</a></div>
+</footer>
+<script>
+// STATE
+let phase = 0; // 0=init,1=created,2=separated,3=alice,4=bob
+let currentBell = 'Φ+';
+let aliceResult = null, bobResult = null;
+let stats = {total:0, corr:0, anti:0};
+let particles = [];
+let animFrame = 0;
+
+// CANVAS
+const canvas = document.getElementById('ent-canvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+
+const BELL_INFO = {
+  'Φ+': {state:'(|00⟩ + |11⟩)/√2', correlated:true, desc:'Φ⁺ = (1/√2)(|00⟩ + |11⟩) — same outcomes always'},
+  'Φ-': {state:'(|00⟩ − |11⟩)/√2', correlated:true, desc:'Φ⁻ = (1/√2)(|00⟩ − |11⟩) — same outcomes, opposite phase'},
+  'Ψ+': {state:'(|01⟩ + |10⟩)/√2', correlated:false, desc:'Ψ⁺ = (1/√2)(|01⟩ + |10⟩) — always opposite outcomes'},
+  'Ψ-': {state:'(|01⟩ − |10⟩)/√2', correlated:false, desc:'Ψ⁻ = (1/√2)(|01⟩ − |10⟩) — always opposite, minus phase'},
+};
+
+function selectBell(b, el) {
+  currentBell = b;
+  document.querySelectorAll('.bell-btn').forEach(btn=>btn.classList.remove('active'));
+  el.classList.add('active');
+  const info = BELL_INFO[b];
+  document.getElementById('info-body').innerHTML = `The Bell state ${b} is written as <code>${info.state}</code>. ${info.desc}. This is one of four maximally entangled two-qubit states that form a complete orthonormal basis for the two-qubit Hilbert space.`;
+  resetExperiment();
+}
+
+function setStep(n) {
+  for(let i=1;i<=4;i++){
+    const el=document.getElementById(`step${i}`);
+    el.className='step-card'+(i<n?' done':i===n?' active':'');
+  }
+}
+
+function createPair() {
+  phase=1;
+  setStep(2);
+  document.getElementById('btn-separate').disabled=false;
+  document.getElementById('btn-create').disabled=true;
+  document.getElementById('scene-caption').textContent=`Bell state ${currentBell} created: ${BELL_INFO[currentBell].state}`;
+  setCaption('pair');
+  spawnEntanglementParticles('center');
+}
+
+function separateQubits() {
+  phase=2;
+  setStep(3);
+  document.getElementById('btn-alice').disabled=false;
+  document.getElementById('btn-separate').disabled=true;
+  document.getElementById('scene-caption').textContent='Qubits separated — Alice (Earth) and Bob (distant galaxy). Entanglement persists.';
+  setCaption('separate');
+  spawnEntanglementParticles('separate');
+}
+
+function aliceMeasure() {
+  phase=3;
+  aliceResult = Math.random()<0.5 ? 0 : 1;
+  setStep(4);
+  document.getElementById('btn-bob').disabled=false;
+  document.getElementById('btn-alice').disabled=true;
+  const res = aliceResult;
+  const el = document.getElementById('alice-result');
+  el.textContent = res===0?'↑':'↓';
+  el.className = `mc-result ${res===0?'spin-up':'spin-down'}`;
+  document.getElementById('alice-card').className = `meas-card result-${res}`;
+  document.getElementById('alice-label').textContent = res===0?'Measured |0⟩ (spin up)':'Measured |1⟩ (spin down)';
+  document.getElementById('alice-dist').textContent = 'Bob\'s qubit collapses NOW';
+  setCaption('alice',res);
+  spawnCollapse('alice',res);
+}
+
+function bobMeasure() {
+  phase=4;
+  const info = BELL_INFO[currentBell];
+  // Determine Bob's result based on Bell state
+  if(info.correlated) {
+    bobResult = aliceResult; // same outcome
+  } else {
+    bobResult = 1-aliceResult; // opposite outcome
+  }
+  document.getElementById('btn-bob').disabled=true;
+  const res = bobResult;
+  const el = document.getElementById('bob-result');
+  el.textContent = res===0?'↑':'↓';
+  el.className = `mc-result ${res===0?'spin-up':'spin-down'}`;
+  document.getElementById('bob-card').className = `meas-card result-${res}`;
+  document.getElementById('bob-label').textContent = res===0?'Measured |0⟩ (spin up)':'Measured |1⟩ (spin down)';
+  const correlated = aliceResult===bobResult;
+  document.getElementById('bob-dist').textContent = correlated?'✓ Correlated as predicted':'✓ Anti-correlated as predicted';
+
+  // Update stats
+  stats.total++;
+  if(correlated) stats.corr++; else stats.anti++;
+  updateStats();
+  setCaption('bob',res,correlated);
+  spawnCollapse('bob',res);
+
+  // Reset for next run
+  setTimeout(resetExperiment, 1200);
+}
+
+function resetExperiment() {
+  phase=0;
+  aliceResult=null;bobResult=null;
+  setStep(1);
+  document.getElementById('btn-create').disabled=false;
+  document.getElementById('btn-separate').disabled=true;
+  document.getElementById('btn-alice').disabled=true;
+  document.getElementById('btn-bob').disabled=true;
+  document.getElementById('alice-result').textContent='?';
+  document.getElementById('alice-result').className='mc-result unknown';
+  document.getElementById('alice-card').className='meas-card';
+  document.getElementById('alice-label').textContent='Not yet measured';
+  document.getElementById('alice-dist').textContent='';
+  document.getElementById('bob-result').textContent='?';
+  document.getElementById('bob-result').className='mc-result unknown';
+  document.getElementById('bob-card').className='meas-card';
+  document.getElementById('bob-label').textContent='Not yet measured';
+  document.getElementById('bob-dist').textContent='';
+  document.getElementById('scene-caption').textContent='Select a Bell state and press Create Entangled Pair to begin';
+}
+
+function setCaption(state, result, correlated) {
+  const captions = {
+    pair: `Bell state ${currentBell} created: ${BELL_INFO[currentBell].state} — two qubits in superposition`,
+    separate: 'Qubits travel to opposite ends of the universe. Entanglement survives any distance.',
+    alice: `Alice measured |${result}⟩. Bob's qubit collapses instantaneously — but Bob doesn't know yet.`,
+    bob: correlated ? `Bob measured |${result}⟩. ${BELL_INFO[currentBell].correlated?'Perfect correlation':'Perfect anti-correlation'} confirmed! Quantum mechanics wins again.` : '',
+  };
+  document.getElementById('scene-caption').textContent = captions[state]||'';
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent=stats.total;
+  document.getElementById('stat-corr').textContent=stats.corr;
+  document.getElementById('stat-anti').textContent=stats.anti;
+  if(stats.total>0){
+    const info=BELL_INFO[currentBell];
+    const relevant=info.correlated?stats.corr:stats.anti;
+    const pct=(relevant/stats.total*100).toFixed(1)+'%';
+    document.getElementById('stat-pct').textContent=pct;
+    document.getElementById('corr-pct').textContent=pct;
+    document.getElementById('corr-bar').style.width=pct;
+  }
+}
+
+function resetStats(){stats={total:0,corr:0,anti:0};updateStats();document.getElementById('corr-pct').textContent='—';document.getElementById('corr-bar').style.width='0%';}
+
+function runMany(n){
+  resetExperiment();
+  for(let i=0;i<n;i++){
+    const a=Math.random()<0.5?0:1;
+    const info=BELL_INFO[currentBell];
+    const b=info.correlated?a:1-a;
+    stats.total++;
+    if(a===b)stats.corr++;else stats.anti++;
+  }
+  updateStats();
+}
+
+// CANVAS ANIMATION
+function spawnEntanglementParticles(mode) {
+  particles = [];
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
+  if(mode==='center'){
+    for(let i=0;i<30;i++){
+      const angle=Math.random()*Math.PI*2;
+      particles.push({x:cx,y:cy,vx:Math.cos(angle)*2,vy:Math.sin(angle)*2,life:1,decay:.015,color:'#00e5ff',r:3});
+    }
+  } else if(mode==='separate'){
+    for(let i=0;i<20;i++){
+      particles.push({x:cx,y:cy,vx:-3-Math.random()*2,vy:(Math.random()-.5)*.5,life:1,decay:.008,color:'#00e5ff',r:4,target:'alice'});
+      particles.push({x:cx,y:cy,vx:3+Math.random()*2,vy:(Math.random()-.5)*.5,life:1,decay:.008,color:'#ff00aa',r:4,target:'bob'});
+    }
+  }
+}
+
+function spawnCollapse(side,result){
+  const W=canvas.width,H=canvas.height;
+  const cx=side==='alice'?W*0.2:W*0.8,cy=H*0.5;
+  const color=result===0?'#00e5ff':'#ff00aa';
+  for(let i=0;i<20;i++){
+    const angle=Math.random()*Math.PI*2;
+    particles.push({x:cx,y:cy,vx:Math.cos(angle)*3,vy:Math.sin(angle)*3,life:1,decay:.025,color,r:3});
+  }
+}
+
+function drawScene(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const W=canvas.width,H=canvas.height;
+  animFrame++;
+
+  // Background grid
+  ctx.strokeStyle='rgba(0,229,255,.03)';
+  ctx.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // Alice and Bob positions
+  const aliceX=W*0.18,bobX=W*0.82,midY=H*0.5;
+
+  // Draw entanglement line when separated
+  if(phase>=2){
+    const t=Math.sin(animFrame*0.05);
+    const grad=ctx.createLinearGradient(aliceX,midY,bobX,midY);
+    grad.addColorStop(0,'rgba(0,229,255,.4)');
+    grad.addColorStop(0.5+t*0.1,'rgba(255,0,170,.3)');
+    grad.addColorStop(1,'rgba(0,229,255,.4)');
+    ctx.strokeStyle=grad;
+    ctx.lineWidth=1.5;
+    ctx.setLineDash([6,4]);
+    ctx.beginPath();
+    ctx.moveTo(aliceX,midY);
+    ctx.lineTo(bobX,midY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Alice qubit
+  drawQubit(aliceX,midY,'Alice',aliceResult,phase>=2);
+  // Bob qubit
+  drawQubit(bobX,midY,'Bob',bobResult,phase>=2);
+
+  // Source (center)
+  if(phase<=1){
+    const glow=0.5+0.5*Math.sin(animFrame*0.08);
+    ctx.beginPath();
+    ctx.arc(W/2,midY,16+glow*4,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(255,0,170,${0.3+glow*0.3})`;
+    ctx.lineWidth=2;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(W/2,midY,8,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,0,170,.6)';
+    ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.8)';
+    ctx.font='9px Orbitron';
+    ctx.textAlign='center';
+    ctx.fillText('SOURCE',W/2,midY+28);
+  }
+
+  // Particles
+  particles=particles.filter(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.vx*=0.96;p.vy*=0.96;p.life-=p.decay;
+    if(p.life<=0)return false;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);
+    ctx.fillStyle=p.color+Math.round(p.life*200).toString(16).padStart(2,'0');
+    ctx.shadowColor=p.color;ctx.shadowBlur=8;ctx.fill();ctx.shadowBlur=0;
+    return true;
+  });
+
+  requestAnimationFrame(drawScene);
+}
+
+function drawQubit(x,y,label,result,active){
+  const glow=0.4+0.3*Math.sin(animFrame*0.06+x);
+  const color=result===null?'#5a6080':result===0?'#00e5ff':'#ff00aa';
+  ctx.beginPath();
+  ctx.arc(x,y,22+glow*4,0,Math.PI*2);
+  ctx.strokeStyle=`${color}${Math.round(glow*160).toString(16).padStart(2,'0')}`;
+  ctx.lineWidth=1.5;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(x,y,14,0,Math.PI*2);
+  ctx.fillStyle=active?`${color}30`:'rgba(30,30,60,.8)';
+  ctx.fill();
+  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();
+
+  // Inner symbol
+  ctx.fillStyle=color;
+  ctx.font='bold 12px Orbitron';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText(result===null?'?':result===0?'↑':'↓',x,y);
+
+  // Label
+  ctx.font='9px DM Mono';
+  ctx.fillStyle='rgba(200,220,255,.5)';
+  ctx.textBaseline='top';
+  ctx.fillText(label,x,y+22);
+}
+
+drawScene();
+setStep(1);
+</script>
+</body>
+</html>

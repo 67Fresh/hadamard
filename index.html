@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadamard — Free Quantum Computing Tools & Simulators</title>
+<meta name="description" content="Free quantum computing tools: quantum circuit simulator, quantum random number generator, qubit visualizer, and more. No sign-up, no cost. Built for developers, students, and the curious.">
+<meta name="keywords" content="quantum circuit simulator, quantum computing tools, qubit simulator, quantum gate, Hadamard gate, Bell state, quantum random, free quantum computing online">
+<link rel="canonical" href="https://hadamard.app">
+<meta property="og:title" content="Hadamard — Free Quantum Computing Tools &amp; Simulators">
+<meta property="og:description" content="Quantum circuit simulator, QRNG, qubit visualizer. Free, no sign-up. For developers, students, and the curious.">
+<meta property="og:type" content="website">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Orbitron:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;1,300;0,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#02020a;--surface:#080814;--surface2:#0e0e1e;--surface3:#141428;
+  --border:#1a1a30;--border2:#242440;
+  --cyan:#00e5ff;--cyan-dim:rgba(0,229,255,.08);--cyan-glow:rgba(0,229,255,.15);
+  --magenta:#ff00aa;--mag-dim:rgba(255,0,170,.06);
+  --green:#00ff9d;--gold:#e8c84a;--white:#e8f0ff;--muted:#5a6080;--dim:#2a2d40;
+  --font-display:'Orbitron',monospace;--font-body:'DM Mono',monospace;--font-serif:'Crimson Pro',Georgia,serif
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--font-body);font-size:13px;min-height:100vh;overflow-x:hidden}
+a{color:var(--muted);text-decoration:none}
+
+/* STARFIELD */
+#starfield{position:fixed;inset:0;pointer-events:none;z-index:0}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:rgba(2,2,10,.85);border-bottom:1px solid var(--border);backdrop-filter:blur(12px)}
+.nav-logo{font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:4px;color:var(--cyan);text-shadow:0 0 20px var(--cyan)}
+.nav-logo span{color:var(--magenta)}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;transition:color .15s}
+.nav-links a:hover{color:var(--cyan)}
+.nav-back{font-size:10px;letter-spacing:1.5px;color:var(--muted);border:1px solid var(--border2);border-radius:2px;padding:5px 10px;transition:all .15s}
+.nav-back:hover{color:var(--cyan);border-color:var(--cyan)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px 60px;text-align:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(0,229,255,.2);border-radius:100px;padding:6px 16px;font-size:10px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;margin-bottom:32px;background:var(--cyan-dim);backdrop-filter:blur(4px)}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pulse 2s ease-in-out infinite;box-shadow:0 0 8px var(--cyan)}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.5)}}
+
+.hero-title{font-family:var(--font-display);font-size:clamp(36px,8vw,80px);font-weight:900;letter-spacing:2px;line-height:1.05;margin-bottom:8px}
+.hero-title .line1{color:var(--white)}
+.hero-title .line2{color:var(--cyan);text-shadow:0 0 40px rgba(0,229,255,.4)}
+.hero-title .line3{color:var(--white);font-size:.6em;letter-spacing:8px;font-weight:400;opacity:.5}
+.hero-sub{font-family:var(--font-serif);font-style:italic;font-size:18px;color:var(--muted);max-width:560px;line-height:1.7;margin:24px auto 40px}
+
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:60px}
+.btn-primary{padding:14px 32px;background:var(--cyan);border:none;border-radius:2px;color:#000;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 0 24px rgba(0,229,255,.3)}
+.btn-primary:hover{background:#fff;box-shadow:0 0 40px rgba(0,229,255,.5);transform:translateY(-1px)}
+.btn-secondary{padding:14px 28px;background:none;border:1px solid var(--border2);border-radius:2px;color:var(--muted);font-family:var(--font-body);font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-secondary:hover{border-color:var(--cyan);color:var(--cyan)}
+
+/* STATS */
+.hero-stats{display:flex;gap:40px;flex-wrap:wrap;justify-content:center}
+.hs-item{text-align:center}
+.hs-num{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--cyan);margin-bottom:2px}
+.hs-label{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+
+/* CIRCUIT SIMULATOR */
+.section{position:relative;z-index:1;padding:80px 24px;max-width:1200px;margin:0 auto}
+.sec-label{font-size:9px;letter-spacing:4px;color:var(--cyan);text-transform:uppercase;margin-bottom:12px}
+.sec-title{font-family:var(--font-display);font-size:clamp(24px,4vw,40px);font-weight:700;color:var(--white);letter-spacing:2px;margin-bottom:8px}
+.sec-sub{font-family:var(--font-serif);font-style:italic;color:var(--muted);font-size:15px;margin-bottom:32px}
+
+/* CIRCUIT UI */
+.circuit-wrap{background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow:hidden}
+.circuit-toolbar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.ct-label{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-right:4px}
+.gate-btn{padding:6px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;color:var(--white);font-family:var(--font-body);font-size:11px;cursor:pointer;transition:all .12s;position:relative}
+.gate-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.gate-btn.selected{border-color:var(--cyan);background:var(--cyan-dim);color:var(--cyan)}
+.gate-btn[data-gate="H"]{color:#00e5ff}
+.gate-btn[data-gate="X"]{color:#ff6b6b}
+.gate-btn[data-gate="Y"]{color:#ffd93d}
+.gate-btn[data-gate="Z"]{color:#6bcb77}
+.gate-btn[data-gate="CNOT"]{color:#a855f7}
+.gate-btn[data-gate="T"]{color:#ff9f43}
+.gate-btn[data-gate="S"]{color:#48dbfb}
+.gate-btn[data-gate="M"]{color:var(--green)}
+.ct-sep{width:1px;height:24px;background:var(--border);margin:0 4px;flex-shrink:0}
+.ct-action{padding:6px 12px;background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);font-family:var(--font-body);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .12s}
+.ct-action:hover{border-color:var(--cyan);color:var(--cyan)}
+.ct-action.run{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:500}
+.ct-action.run:hover{background:#fff}
+
+/* CIRCUIT GRID */
+.circuit-body{display:flex;gap:0}
+.circuit-qubit-labels{padding:48px 0 12px;display:flex;flex-direction:column;gap:0;border-right:1px solid var(--border);min-width:64px}
+.qubit-label{height:52px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:11px;color:var(--muted);letter-spacing:1px;padding:0 8px}
+
+.circuit-grid-wrap{flex:1;overflow-x:auto}
+.circuit-header{display:flex;height:48px;border-bottom:1px solid var(--border);padding-left:8px}
+.circuit-step-label{width:60px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;border-right:1px solid var(--border)}
+
+.circuit-rows{display:flex;flex-direction:column}
+.circuit-row{display:flex;align-items:center;height:52px;border-bottom:1px solid var(--border)}
+.circuit-row:last-child{border-bottom:none}
+.circuit-wire{width:60px;flex-shrink:0;height:2px;background:var(--border2);border-right:1px solid var(--border);position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;height:52px;transition:background .12s}
+.circuit-wire:hover{background:var(--cyan-dim)}
+.circuit-wire.has-gate{cursor:default}
+.circuit-wire.has-gate:hover{background:transparent}
+.gate-cell{width:44px;height:44px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:14px;font-weight:700;border:2px solid;position:relative;cursor:pointer;transition:all .12s;user-select:none}
+.gate-cell:hover{transform:scale(1.08)}
+.gate-cell.G-H{background:rgba(0,229,255,.1);border-color:#00e5ff;color:#00e5ff}
+.gate-cell.G-X{background:rgba(255,107,107,.1);border-color:#ff6b6b;color:#ff6b6b}
+.gate-cell.G-Y{background:rgba(255,217,61,.1);border-color:#ffd93d;color:#ffd93d}
+.gate-cell.G-Z{background:rgba(107,203,119,.1);border-color:#6bcb77;color:#6bcb77}
+.gate-cell.G-T{background:rgba(255,159,67,.1);border-color:#ff9f43;color:#ff9f43}
+.gate-cell.G-S{background:rgba(72,219,251,.1);border-color:#48dbfb;color:#48dbfb}
+.gate-cell.G-M{background:rgba(0,255,157,.1);border-color:#00ff9d;color:#00ff9d;font-size:18px}
+.gate-cell.G-CNOT-ctrl{background:rgba(168,85,247,.15);border-color:#a855f7;color:#a855f7;border-radius:50%}
+.gate-cell.G-CNOT-target{background:rgba(168,85,247,.1);border-color:#a855f7;color:#a855f7}
+.wire-line{position:absolute;left:0;right:0;height:2px;background:var(--border2);z-index:0}
+
+/* PROBABILITY DISPLAY */
+.prob-section{padding:16px;border-top:1px solid var(--border);background:var(--surface2)}
+.prob-title{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+.prob-bars{display:flex;flex-direction:column;gap:8px}
+.prob-row{display:flex;align-items:center;gap:10px}
+.prob-state{font-family:var(--font-body);font-size:11px;color:var(--cyan);width:80px;flex-shrink:0;letter-spacing:1px}
+.prob-bar-wrap{flex:1;height:16px;background:var(--surface);border-radius:2px;overflow:hidden;border:1px solid var(--border)}
+.prob-bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--magenta));transition:width .4s ease;border-radius:2px}
+.prob-pct{font-size:11px;color:var(--white);width:44px;text-align:right;flex-shrink:0}
+.run-note{font-family:var(--font-serif);font-style:italic;font-size:13px;color:var(--dim);margin-top:12px}
+
+/* PRESET CIRCUITS */
+.presets-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.preset-chip{padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;color:var(--muted);font-family:var(--font-body);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .12s}
+.preset-chip:hover{border-color:var(--cyan);color:var(--cyan)}
+
+/* TOOL CARDS */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:32px}
+.tool-card{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:24px;transition:all .2s;position:relative;overflow:hidden;text-decoration:none;display:block}
+.tool-card::before{content:'';position:absolute;inset:0;background:var(--cyan-dim);opacity:0;transition:opacity .2s}
+.tool-card:hover::before{opacity:1}
+.tool-card:hover{border-color:var(--cyan);transform:translateY(-2px)}
+.tc-icon{font-size:28px;margin-bottom:12px}
+.tc-title{font-family:var(--font-display);font-size:16px;font-weight:700;letter-spacing:2px;color:var(--white);margin-bottom:8px}
+.tc-desc{font-family:var(--font-serif);font-size:14px;color:var(--muted);line-height:1.6}
+.tc-badge{display:inline-block;margin-top:12px;font-size:9px;letter-spacing:2px;color:var(--cyan);text-transform:uppercase;border:1px solid rgba(0,229,255,.2);padding:3px 8px;border-radius:2px}
+.tc-soon{color:var(--muted);border-color:var(--border2)}
+
+/* FOOTER */
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:32px;text-align:center}
+.footer-logo{font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:4px;color:var(--cyan);margin-bottom:8px;text-shadow:0 0 20px rgba(0,229,255,.3)}
+.footer-sub{font-size:11px;color:var(--dim);letter-spacing:1px;margin-bottom:16px}
+.footer-links-row{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:16px}
+.footer-links-row a{font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;transition:color .15s}
+.footer-links-row a:hover{color:var(--cyan)}
+.footer-copy{font-size:11px;color:var(--dim)}
+
+@media(max-width:768px){nav .nav-links{display:none}.circuit-body{flex-direction:column}}
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+
+<nav>
+  <div class="nav-logo">HADAMARD<span style="font-size:14px;letter-spacing:2px;color:var(--magenta)">.app</span></div>
+  <ul class="nav-links">
+    <li><a href="#simulator">Simulator</a></li>
+    <li><a href="#tools">Tools</a></li>
+  </ul>
+  
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">Now Live — Beta</div>
+  <div class="hero-title">
+    <div class="line3">WELCOME TO</div>
+    
+    <div class="line1">HADAMARD</div>
+    <div class="line2">.APP</div>
+  </div>
+  <div class="hero-sub">Free quantum computing tools for developers, students, and the genuinely curious. Named for the gate that starts it all. No sign-up. No cost. Just quantum.</div>
+  <div class="hero-cta">
+    <a href="quantum-circuit.html" class="btn-primary">⚛ Open Circuit Simulator</a>
+    <a href="#tools" class="btn-secondary">Browse All Tools →</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hs-item"><div class="hs-num">∞</div><div class="hs-label">Qubits simulated</div></div>
+    <div class="hs-item"><div class="hs-num">$0</div><div class="hs-label">Cost always</div></div>
+    <div class="hs-item"><div class="hs-num">100%</div><div class="hs-label">Browser-based</div></div>
+  </div>
+</section>
+
+<!-- CIRCUIT SIMULATOR -->
+<section class="section" id="simulator">
+  <div class="sec-label">⚛ Flagship Tool</div>
+  <div class="sec-title">QUANTUM CIRCUIT SIMULATOR</div>
+  <div class="sec-sub">Build quantum circuits with real gate math. Click a gate, click a wire. Run to see probability outcomes.</div>
+
+  <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Preset circuits</div>
+  <div class="presets-row">
+    <button class="preset-chip" onclick="loadPreset('bell')">Bell State (Entanglement)</button>
+    <button class="preset-chip" onclick="loadPreset('superpos')">Superposition</button>
+    <button class="preset-chip" onclick="loadPreset('teleport')">Quantum Teleportation</button>
+    <button class="preset-chip" onclick="loadPreset('grover')">Grover Search</button>
+    <button class="preset-chip" onclick="loadPreset('clear')">✕ Clear</button>
+  </div>
+
+  <div class="circuit-wrap">
+    <!-- TOOLBAR -->
+    <div class="circuit-toolbar">
+      <span class="ct-label">Gates:</span>
+      <button class="gate-btn" data-gate="H" onclick="selectGate('H')" title="Hadamard — creates superposition">H</button>
+      <button class="gate-btn" data-gate="X" onclick="selectGate('X')" title="Pauli-X — quantum NOT gate">X</button>
+      <button class="gate-btn" data-gate="Y" onclick="selectGate('Y')" title="Pauli-Y">Y</button>
+      <button class="gate-btn" data-gate="Z" onclick="selectGate('Z')" title="Pauli-Z — phase flip">Z</button>
+      <button class="gate-btn" data-gate="S" onclick="selectGate('S')" title="S gate — π/2 phase">S</button>
+      <button class="gate-btn" data-gate="T" onclick="selectGate('T')" title="T gate — π/4 phase">T</button>
+      <button class="gate-btn" data-gate="CNOT" onclick="selectGate('CNOT')" title="CNOT — controlled NOT, creates entanglement">CNOT</button>
+      <button class="gate-btn" data-gate="M" onclick="selectGate('M')" title="Measure qubit">⊛</button>
+      <div class="ct-sep"></div>
+      <button class="ct-action" onclick="addStep()">+ Step</button>
+      <button class="ct-action" onclick="removeStep()">− Step</button>
+      <div class="ct-sep"></div>
+      <button class="ct-action run" onclick="runCircuit()">▶ Run Circuit</button>
+    </div>
+
+    <!-- CIRCUIT BODY -->
+    <div class="circuit-body">
+      <div class="circuit-qubit-labels" id="qubit-labels"></div>
+      <div class="circuit-grid-wrap">
+        <div class="circuit-header" id="circuit-header"></div>
+        <div class="circuit-rows" id="circuit-rows"></div>
+      </div>
+    </div>
+
+    <!-- PROBABILITIES -->
+    <div class="prob-section">
+      <div class="prob-title">Measurement Probabilities — click Run Circuit to calculate</div>
+      <div class="prob-bars" id="prob-bars">
+        <div class="run-note">Build your circuit above, then click Run Circuit to see the quantum state probabilities for each possible measurement outcome.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ALL TOOLS -->
+<section class="section" id="tools" style="padding-top:0">
+  <div class="sec-label">All Tools</div>
+  <div class="sec-title">QUANTUM TOOLKIT</div>
+  <div class="sec-sub">Every tool is free, browser-based, and requires no account.</div>
+
+  <div class="tools-grid">
+    <a href="quantum-circuit.html" class="tool-card">
+      <div class="tc-icon">⚛</div>
+      <div class="tc-title">CIRCUIT SIMULATOR</div>
+      <div class="tc-desc">Build and simulate quantum circuits with real gate math. Hadamard, CNOT, Pauli, S, T gates. Probability readout for all measurement outcomes.</div>
+      <div class="tc-badge">Live</div>
+    </a>
+    <a href="quantum-bloch.html" class="tool-card">
+      <div class="tc-icon">🌐</div>
+      <div class="tc-title">BLOCH SPHERE</div>
+      <div class="tc-desc">3D interactive Bloch sphere. Apply quantum gates, drag to rotate, watch the state vector move. See how every single-qubit gate is a rotation.</div>
+      <div class="tc-badge">Live</div>
+    </a>
+    <a href="quantum-entanglement.html" class="tool-card">
+      <div class="tc-icon">🔗</div>
+      <div class="tc-title">ENTANGLEMENT DEMO</div>
+      <div class="tc-desc">Create Bell pairs, separate qubits across the universe, measure and see perfect correlations. All four Bell states. 100× simulation with live statistics.</div>
+      <div class="tc-badge">Live</div>
+    </a>
+    <a href="quantum-qkd.html" class="tool-card">
+      <div class="tc-icon">🔐</div>
+      <div class="tc-title">BB84 KEY DISTRIBUTION</div>
+      <div class="tc-desc">Simulate the BB84 quantum cryptography protocol. Toggle eavesdropping on/off and watch Eve get detected by the laws of physics — every time.</div>
+      <div class="tc-badge">Live</div>
+    </a>
+    <a href="quantum-grover.html" class="tool-card">
+      <div class="tc-icon">🔍</div>
+      <div class="tc-title">GROVER'S ALGORITHM</div>
+      <div class="tc-desc">Interactive amplitude amplification visualizer. Choose database size, watch the target state emerge from superposition in √N steps. Classical vs quantum comparison.</div>
+      <div class="tc-badge">Live</div>
+    </a>
+    <a href="quantumrng.html" class="tool-card">
+      <div class="tc-icon">🎲</div>
+      <div class="tc-title">QUANTUM RNG</div>
+      <div class="tc-desc">True random numbers from quantum vacuum fluctuations via the ANU QRNG. Not an algorithm — actual quantum physics. 100% browser-based, nothing uploaded.</div>
+      <div class="tc-badge">Live</div>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">HADAMARD<span style="font-size:12px;color:var(--magenta);letter-spacing:2px">.app</span></div>
+  <div class="footer-sub">Free quantum computing tools — built for curious minds</div>
+  <div class="footer-links-row">
+    <a href="#simulator">Circuit Simulator</a>
+    <a href="quantumrng.html">Quantum RNG</a>
+    
+  </div>
+  <div class="footer-copy">© 2026 hadamard.app</div>
+</footer>
+
+<script>
+// ── STARFIELD ──
+const sf = document.getElementById('starfield');
+const sctx = sf.getContext('2d');
+sf.width = window.innerWidth; sf.height = window.innerHeight;
+const stars = Array.from({length:180},()=>({
+  x:Math.random()*sf.width, y:Math.random()*sf.height,
+  r:Math.random()*1.2+.2, o:Math.random()*.7+.1,
+  twinkle:Math.random()*Math.PI*2, speed:Math.random()*.02+.005
+}));
+function drawStars(){
+  sctx.clearRect(0,0,sf.width,sf.height);
+  stars.forEach(s=>{
+    s.twinkle+=s.speed;
+    const alpha=s.o*(0.5+0.5*Math.sin(s.twinkle));
+    sctx.beginPath();sctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    sctx.fillStyle=`rgba(200,220,255,${alpha})`;sctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+window.addEventListener('resize',()=>{sf.width=window.innerWidth;sf.height=window.innerHeight;});
+
+// ── QUANTUM CIRCUIT SIMULATOR ──
+const NUM_QUBITS = 4;
+const MAX_STEPS = 8;
+let numSteps = 6;
+let circuit = []; // circuit[step][qubit] = gate name or null
+let selectedGate = 'H';
+let cnotFirst = null; // for CNOT two-click
+
+function initCircuit() {
+  circuit = Array.from({length:MAX_STEPS},()=>Array(NUM_QUBITS).fill(null));
+}
+
+function selectGate(g) {
+  selectedGate = g;
+  cnotFirst = null;
+  document.querySelectorAll('.gate-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelector(`[data-gate="${g}"]`)?.classList.add('selected');
+}
+
+function addStep() { if(numSteps<MAX_STEPS){numSteps++;renderCircuit();} }
+function removeStep() { if(numSteps>2){numSteps--;renderCircuit();} }
+
+function placeGate(step, qubit) {
+  if (step >= numSteps) return;
+  if (selectedGate === 'CNOT') {
+    if (cnotFirst === null) {
+      cnotFirst = { step, qubit };
+      // show temp indicator
+      renderCircuit();
+    } else {
+      const ctrl = cnotFirst;
+      cnotFirst = null;
+      if (ctrl.step === step && ctrl.qubit !== qubit) {
+        circuit[step][ctrl.qubit] = 'CNOT-ctrl';
+        circuit[step][qubit] = 'CNOT-target';
+        renderCircuit();
+      } else {
+        cnotFirst = null;
+        renderCircuit();
+      }
+    }
+    return;
+  }
+  // Toggle: clicking same gate removes it
+  if (circuit[step][qubit] === selectedGate) {
+    circuit[step][qubit] = null;
+  } else {
+    circuit[step][qubit] = selectedGate;
+  }
+  renderCircuit();
+}
+
+function renderCircuit() {
+  // Labels
+  document.getElementById('qubit-labels').innerHTML =
+    Array.from({length:NUM_QUBITS},(_,i)=>`<div class="qubit-label">|q${i}⟩</div>`).join('');
+
+  // Header
+  document.getElementById('circuit-header').innerHTML =
+    Array.from({length:numSteps},(_,s)=>`<div class="circuit-step-label">T${s+1}</div>`).join('');
+
+  // Rows
+  document.getElementById('circuit-rows').innerHTML = Array.from({length:NUM_QUBITS},(_,q)=>{
+    const cells = Array.from({length:numSteps},(_,s)=>{
+      const g = circuit[s][q];
+      const isCnotPending = cnotFirst && cnotFirst.step===s && cnotFirst.qubit===q;
+      let inner = '<div class="wire-line"></div>';
+      if (g) {
+        const cls = `gate-cell G-${g}`;
+        const label = g==='M'?'⊛':g==='CNOT-ctrl'?'●':g==='CNOT-target'?'⊕':g;
+        inner = `<div class="wire-line"></div><div class="${cls}" onclick="removeGate(${s},${q})" title="Click to remove">${label}</div>`;
+      } else if (isCnotPending) {
+        inner = `<div class="wire-line"></div><div class="gate-cell G-CNOT-ctrl" style="opacity:.5">●</div>`;
+      }
+      return `<div class="circuit-wire ${g?'has-gate':''}" onclick="${g?'':'placeGate('+s+','+q+')'}">${inner}</div>`;
+    }).join('');
+    return `<div class="circuit-row">${cells}</div>`;
+  }).join('');
+}
+
+function removeGate(step, qubit) {
+  circuit[step][qubit] = null;
+  renderCircuit();
+}
+
+// ── QUANTUM STATE MATH ──
+// Represent state as array of complex [re,im] for 2^n basis states
+function complexMul(a, b) { return [a[0]*b[0]-a[1]*b[1], a[0]*b[1]+a[1]*b[0]]; }
+function complexAdd(a, b) { return [a[0]+b[0], a[1]+b[1]]; }
+
+const I = [[1,0],[0,0],[0,0],[1,0]]; // Identity 2x2
+const H_gate = [[1/Math.SQRT2,0],[1/Math.SQRT2,0],[1/Math.SQRT2,0],[-1/Math.SQRT2,0]];
+const X_gate = [[0,0],[1,0],[1,0],[0,0]];
+const Z_gate = [[1,0],[0,0],[0,0],[-1,0]];
+const Y_gate = [[0,0],[0,-1],[0,1],[0,0]];
+const S_gate = [[1,0],[0,0],[0,0],[0,1]];
+const T_gate = [[1,0],[0,0],[0,0],[1/Math.SQRT2,1/Math.SQRT2]];
+
+function applyGate(state, gate2x2, qubit) {
+  const n = NUM_QUBITS;
+  const dim = 1 << n;
+  const newState = Array(dim).fill(null).map(()=>[0,0]);
+  for (let i=0;i<dim;i++) {
+    const bit = (i>>>(n-1-qubit))&1;
+    const j = i^(1<<(n-1-qubit)); // flipped qubit state
+    const [a,b,c,d] = gate2x2;
+    if (bit===0) {
+      newState[i] = complexAdd(newState[i], complexMul(a, state[i]));
+      newState[j] = complexAdd(newState[j], complexMul(c, state[i]));
+    }
+  }
+  for (let i=0;i<dim;i++) {
+    const bit = (i>>>(n-1-qubit))&1;
+    const j = i^(1<<(n-1-qubit));
+    if (bit===1) {
+      newState[i] = complexAdd(newState[i], complexMul(d, state[i]));
+      newState[j] = complexAdd(newState[j], complexMul(b, state[i]));
+    }
+  }
+  return newState;
+}
+
+function applyCNOT(state, ctrl, tgt) {
+  const n = NUM_QUBITS;
+  const dim = 1 << n;
+  const newState = state.map(s=>[...s]);
+  for (let i=0;i<dim;i++) {
+    const ctrlBit = (i>>>(n-1-ctrl))&1;
+    if (ctrlBit===1) {
+      const j = i^(1<<(n-1-tgt));
+      [newState[i],newState[j]] = [newState[j],newState[i]];
+    }
+  }
+  return newState;
+}
+
+function runCircuit() {
+  const n = NUM_QUBITS;
+  const dim = 1<<n;
+  let state = Array(dim).fill(null).map((_,i)=>i===0?[1,0]:[0,0]);
+
+  for (let s=0;s<numSteps;s++) {
+    for (let q=0;q<n;q++) {
+      const g = circuit[s][q];
+      if (!g || g==='CNOT-target' || g==='M') continue;
+      if (g==='CNOT-ctrl') {
+        const tgt = circuit[s].indexOf('CNOT-target');
+        if (tgt>=0) state = applyCNOT(state,q,tgt);
+      } else {
+        const gmap = {H:H_gate,X:X_gate,Y:Y_gate,Z:Z_gate,S:S_gate,T:T_gate};
+        if (gmap[g]) state = applyGate(state,gmap[g],q);
+      }
+    }
+  }
+
+  // Calculate probabilities
+  const probs = state.map(([re,im])=>re*re+im*im);
+  const total = probs.reduce((a,b)=>a+b,0);
+
+  // Show top states
+  const nonzero = probs.map((p,i)=>({p:p/total,i})).filter(x=>x.p>0.001).sort((a,b)=>b.p-a.p).slice(0,8);
+
+  const barsEl = document.getElementById('prob-bars');
+  if (!nonzero.length) {
+    barsEl.innerHTML='<div class="run-note">No probability mass found. Try adding some gates.</div>';
+    return;
+  }
+  barsEl.innerHTML = nonzero.map(({p,i})=>{
+    const label = '|'+i.toString(2).padStart(n,'0')+'⟩';
+    const pct = (p*100).toFixed(1)+'%';
+    return `<div class="prob-row">
+      <span class="prob-state">${label}</span>
+      <div class="prob-bar-wrap"><div class="prob-bar-fill" style="width:${p*100}%"></div></div>
+      <span class="prob-pct">${pct}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── PRESETS ──
+const PRESETS = {
+  bell: ()=>{
+    initCircuit();
+    circuit[0][0]='H';        // H on q0
+    circuit[1][0]='CNOT-ctrl'; circuit[1][1]='CNOT-target'; // CNOT
+  },
+  superpos: ()=>{
+    initCircuit();
+    [0,1,2,3].forEach(q=>circuit[0][q]='H');
+  },
+  teleport: ()=>{
+    initCircuit();
+    circuit[0][1]='H';
+    circuit[1][1]='CNOT-ctrl'; circuit[1][2]='CNOT-target';
+    circuit[2][0]='CNOT-ctrl'; circuit[2][1]='CNOT-target';
+    circuit[3][0]='H';
+    circuit[4][0]='M'; circuit[4][1]='M';
+  },
+  grover: ()=>{
+    initCircuit();
+    [0,1,2].forEach(q=>circuit[0][q]='H');
+    circuit[2][0]='X'; circuit[2][1]='X'; circuit[2][2]='X';
+    [0,1,2].forEach(q=>circuit[4][q]='H');
+    [0,1,2].forEach(q=>circuit[5][q]='X');
+  },
+  clear: ()=>{ initCircuit(); }
+};
+
+function loadPreset(name) {
+  PRESETS[name]?.();
+  renderCircuit();
+  if (name!=='clear') setTimeout(runCircuit,100);
+}
+
+// Init
+selectGate('H');
+initCircuit();
+loadPreset('bell');
+</script>
+</body>
+</html>
