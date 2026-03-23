@@ -181,7 +181,7 @@ footer{border-top:1px solid var(--border);padding:20px 28px;display:flex;justify
     <button class="preset-chip" id="preset-superpos" onclick="loadPreset('superpos',this)">∿ Superposition</button>
     <button class="preset-chip" id="preset-teleport" onclick="loadPreset('teleport',this)">✦ Teleportation</button>
     <button class="preset-chip" id="preset-grover" onclick="loadPreset('grover',this)">🔍 Grover Search</button>
-    <button class="preset-chip" id="preset-qft" onclick="loadPreset('qft',this)">∫ QFT</button>
+    <button class="preset-chip" id="preset-ghz" onclick="loadPreset('ghz',this)">⊕ GHZ State</button>
     <button class="preset-chip" onclick="loadPreset('clear',this)">✕ Clear</button>
   </div>
 
@@ -204,7 +204,7 @@ footer{border-top:1px solid var(--border);padding:20px 28px;display:flex;justify
           <button class="ct-action" onclick="addStep()">+ Step</button>
           <button class="ct-action" onclick="removeStep()">− Step</button>
           <div class="ct-sep"></div>
-          <button class="ct-action run" onclick="runCircuit()">▶ Run</button>
+          <button class="ct-action run" id="run-btn" onclick="flashRunAndRun()">▶ Run</button>
         </div>
 
         <!-- QUBIT COUNT -->
@@ -357,6 +357,7 @@ function initCircuit() {
 
 function setQubits(n, btn) {
   NUM_QUBITS = n;
+  numSteps = 4; // reset steps when changing qubit count
   document.querySelectorAll('.qs-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   initCircuit();
@@ -470,10 +471,48 @@ function renderCircuit() {
     }).join('');
     return `<div class="circuit-row">${cells}</div>`;
   }).join('');
+  // Add CNOT connector lines after DOM is updated
+  requestAnimationFrame(addCNOTConnectors);
 }
 
 function addStep() { if(numSteps<MAX_STEPS){numSteps++;renderCircuit();}}
 function removeStep() { if(numSteps>2){numSteps--;renderCircuit();}}
+
+function addCNOTConnectors() {
+  // After rendering, find CNOT ctrl/target pairs and draw vertical connectors
+  const rows = document.getElementById('circuit-rows');
+  const gridArea = document.querySelector('.circuit-grid-area');
+  if (!rows || !gridArea) return;
+  // Remove old connectors
+  document.querySelectorAll('.cnot-line').forEach(e => e.remove());
+  for (let s = 0; s < numSteps; s++) {
+    let ctrl = -1, tgt = -1;
+    for (let q = 0; q < NUM_QUBITS; q++) {
+      if (circuit[s][q] === 'CNOT-ctrl') ctrl = q;
+      if (circuit[s][q] === 'CNOT-target') tgt = q;
+    }
+    if (ctrl < 0 || tgt < 0) continue;
+    const qMin = Math.min(ctrl, tgt);
+    const qMax = Math.max(ctrl, tgt);
+    // Get the cell DOM elements for ctrl and target
+    const allRows = rows.querySelectorAll('.circuit-row');
+    if (!allRows[qMin] || !allRows[qMax]) continue;
+    const cells = allRows[qMin].querySelectorAll('.wire-cell');
+    const ctrlCell = cells[s];
+    if (!ctrlCell) continue;
+    // Calculate vertical span needed
+    const cellH = 56; // wire-cell height
+    const gapRows = qMax - qMin;
+    const line = document.createElement('div');
+    line.className = 'cnot-line';
+    line.style.cssText = `position:absolute;width:2px;background:#a855f7;opacity:.5;
+      pointer-events:none;z-index:2;border-radius:2px;
+      top:50%;left:50%;transform:translateX(-50%);
+      height:${gapRows * cellH}px;`;
+    ctrlCell.style.position = 'relative';
+    ctrlCell.appendChild(line);
+  }
+}
 
 // ── QUANTUM MATH ──
 const SQ2 = Math.SQRT2;
@@ -527,12 +566,33 @@ function applyCNOTMath(state, ctrl, tgt) {
   return out;
 }
 
+function applyMeasurement(state, qubit, n) {
+  // Probabilistically collapse the qubit — compute P(0) and decide
+  const dim = 1 << n;
+  let p0 = 0;
+  for (let i = 0; i < dim; i++) {
+    const bit = (i >>> (n-1-qubit)) & 1;
+    if (bit === 0) p0 += state[i][0]**2 + state[i][1]**2;
+  }
+  const outcome = Math.random() < p0 ? 0 : 1;
+  // Zero out the other branch and renormalize
+  const norm = outcome === 0 ? Math.sqrt(p0) : Math.sqrt(1 - p0);
+  if (norm < 1e-10) return state; // avoid div by zero
+  const out = state.map((amp, i) => {
+    const bit = (i >>> (n-1-qubit)) & 1;
+    if (bit !== outcome) return [0, 0];
+    return [amp[0]/norm, amp[1]/norm];
+  });
+  return out;
+}
+
 function runCircuit() {
   const n = NUM_QUBITS;
   const dim = 1<<n;
   let state = Array.from({length:dim}, (_,i)=>i===0?[1,0]:[0,0]);
 
   for (let s=0;s<numSteps;s++) {
+    // First handle all single-qubit and CNOT gates
     for (let q=0;q<n;q++) {
       const g = circuit[s][q];
       if (!g || g==='CNOT-target' || g==='M') continue;
@@ -541,6 +601,12 @@ function runCircuit() {
         if (tgt>=0) state = applyCNOTMath(state, q, tgt);
       } else if (GATE_MATS[g]) {
         state = applyGateMath(state, GATE_MATS[g], q);
+      }
+    }
+    // Then handle measurement gates (collapse the measured qubit)
+    for (let q=0;q<n;q++) {
+      if (circuit[s][q] === 'M') {
+        state = applyMeasurement(state, q, n);
       }
     }
   }
@@ -624,15 +690,12 @@ const PRESETS = {
     [0,1,2].forEach(q=>circuit[6][q]='X');
     [0,1,2].forEach(q=>circuit[7][q]='H');
   },
-  qft: ()=>{
+  ghz: ()=>{
     setQubits(3, document.getElementById('qs-3'));
-    numSteps=6;
+    numSteps=4;
     circuit[0][0]='H';
-    circuit[1][0]='S'; // CR2
-    circuit[2][0]='T'; // CR3
-    circuit[3][1]='H';
-    circuit[4][1]='S'; // CR2
-    circuit[5][2]='H';
+    circuit[1][0]='CNOT-ctrl'; circuit[1][1]='CNOT-target';
+    circuit[2][1]='CNOT-ctrl'; circuit[2][2]='CNOT-target';
   },
   clear: ()=>{
     initCircuit();
@@ -647,6 +710,19 @@ function loadPreset(name, btn) {
   renderCircuit();
   clearProbs();
   if (name !== 'clear') setTimeout(runCircuit, 150);
+}
+
+function flashRunAndRun() {
+  const btn = document.getElementById('run-btn');
+  btn.textContent = '⟳ Running...';
+  btn.style.background = '#fff';
+  btn.style.color = '#000';
+  setTimeout(() => {
+    runCircuit();
+    btn.textContent = '▶ Run';
+    btn.style.background = '';
+    btn.style.color = '';
+  }, 80);
 }
 
 // ── BOOT ──
