@@ -249,11 +249,16 @@ function runProtocol(){
   // Bob's bases and measurements
   const bobBases=Array.from({length:n},()=>Math.random()<.5?'⊕':'⊗');
   const bobReads=aliceBits.map((b,i)=>{
-    const src=eveEnabled?eveReads[i]:b; // Eve may have changed it
-    const srcBasis=eveEnabled?eveBases[i]:aliceBases[i];
-    if(bobBases[i]===aliceBases[i])return b; // correct basis from Alice
-    if(eveEnabled&&bobBases[i]===eveBases[i])return eveReads[i]; // correct basis from Eve
-    return Math.random()<.5?0:1; // mismatch
+    if(!eveEnabled){
+      // No Eve: Bob gets Alice's qubit directly
+      if(bobBases[i]===aliceBases[i]) return b; // correct basis → correct bit
+      return Math.random()<.5?0:1; // wrong basis → random
+    } else {
+      // Eve present: Bob receives Eve's re-sent qubit (not Alice's)
+      // Eve measured in eveBases[i] and got eveReads[i], then re-sent in eveBases[i]
+      if(bobBases[i]===eveBases[i]) return eveReads[i]; // Bob's basis matches Eve's → correct from Eve
+      return Math.random()<.5?0:1; // Bob's basis != Eve's → random result
+    }
   });
 
   // Sifting — keep only matching bases (Alice/Bob)
