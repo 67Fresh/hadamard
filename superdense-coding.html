@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Superdense Coding Simulator — 2 Bits Per Qubit | Hadamard</title>
+<meta name="description" content="Interactive superdense coding simulator. Send 2 classical bits using 1 qubit by exploiting pre-shared entanglement. Choose your message, watch Alice encode it, watch Bob decode it.">
+<meta name="keywords" content="superdense coding, superdense coding simulator, quantum communication, 2 bits per qubit, dense coding quantum, bell pair communication">
+<link rel="canonical" href="https://hadamard.app/superdense-coding.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Superdense Coding Simulator","url":"https://hadamard.app/superdense-coding.html","applicationCategory":"EducationalApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Orbitron:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#02020a;--surface:#080814;--surface2:#0e0e1e;--border:#1a1a30;--border2:#242440;--cyan:#00e5ff;--cyan-dim:rgba(0,229,255,.08);--magenta:#ff00aa;--green:#00ff9d;--gold:#e8c84a;--white:#e8f0ff;--muted:#5a6080;--dim:#2a2d40;--purple:#a855f7;--font-display:'Orbitron',monospace;--font-body:'DM Mono',monospace;--font-serif:'Crimson Pro',Georgia,serif}
+body{background:var(--bg);color:var(--white);font-family:var(--font-body);font-size:13px;min-height:100vh}
+a{color:var(--cyan);text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;border-bottom:1px solid var(--border);background:rgba(2,2,10,.92);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+.nav-logo{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-decoration:none}.nav-logo span{color:var(--magenta)}
+.nav-back{font-size:10px;letter-spacing:1.5px;color:var(--muted);border:1px solid var(--border2);padding:5px 10px;border-radius:2px;text-decoration:none;transition:all .15s}.nav-back:hover{color:var(--cyan);border-color:var(--cyan)}
+.page-wrap{max-width:860px;margin:0 auto;padding:40px 24px 80px}
+.page-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(0,229,255,.2);border-radius:2px;padding:3px 10px;font-size:9px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;margin-bottom:12px;background:var(--cyan-dim)}
+h1{font-family:var(--font-display);font-size:clamp(20px,4vw,36px);font-weight:900;letter-spacing:2px;color:var(--white);line-height:1;margin-bottom:8px}h1 em{color:var(--cyan);font-style:normal}
+.page-sub{font-family:var(--font-serif);font-style:italic;color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:32px}
+/* MESSAGE PICKER */
+.msg-picker{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:20px 24px;margin-bottom:20px}
+.mp-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.mp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.msg-btn{padding:14px 8px;background:var(--surface2);border:1px solid var(--border2);border-radius:3px;cursor:pointer;transition:all .12s;text-align:center}
+.msg-btn:hover{border-color:var(--magenta)}
+.msg-btn.active{border-color:var(--magenta);background:rgba(255,0,170,.08)}
+.msg-bits{font-family:var(--font-display);font-size:20px;font-weight:900;color:var(--white);margin-bottom:4px}
+.msg-btn.active .msg-bits{color:var(--magenta)}
+.msg-gate{font-size:10px;color:var(--muted);letter-spacing:1px}
+.msg-btn.active .msg-gate{color:rgba(255,0,170,.7)}
+/* PROTOCOL FLOW */
+.protocol-flow{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.proto-step{background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow:hidden;transition:border-color .2s}
+.proto-step.active-step{border-color:var(--cyan)}
+.proto-step.done-step{border-color:rgba(0,255,157,.3)}
+.ps-head{display:flex;align-items:center;gap:14px;padding:14px 18px}
+.ps-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--font-display);flex-shrink:0}
+.ps-num.pending{background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.ps-num.active{background:var(--cyan-dim);border:1px solid var(--cyan);color:var(--cyan)}
+.ps-num.done{background:rgba(0,255,157,.1);border:1px solid rgba(0,255,157,.3);color:var(--green)}
+.ps-title{font-family:var(--font-display);font-size:12px;letter-spacing:1px;color:var(--white);flex:1}
+.ps-badge{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:2px}
+.badge-alice{background:rgba(255,0,170,.1);border:1px solid rgba(255,0,170,.3);color:var(--magenta)}
+.badge-bob{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--cyan)}
+.badge-shared{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3);color:var(--purple)}
+.ps-body{padding:0 18px 16px;display:none}
+.proto-step.active-step .ps-body,.proto-step.done-step .ps-body{display:block}
+.ps-state{font-family:var(--font-body);font-size:12px;color:var(--cyan);margin-bottom:8px;line-height:1.8}
+.ps-explain{font-family:var(--font-serif);font-size:14px;color:var(--muted);line-height:1.6}
+/* CONTROLS */
+.controls{display:flex;gap:10px;margin-bottom:20px}
+.ctrl-btn{padding:9px 20px;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;color:var(--muted);font-family:var(--font-body);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .12s}
+.ctrl-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.ctrl-btn.primary{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:500}
+.ctrl-btn.primary:hover{background:#fff}
+/* RESULT */
+.result-card{background:var(--surface);border:1px solid rgba(0,255,157,.3);border-radius:4px;padding:24px;text-align:center;display:none;margin-bottom:20px}
+.result-card.show{display:block}
+.result-icon{font-size:36px;margin-bottom:10px}
+.result-title{font-family:var(--font-display);font-size:15px;color:var(--green);letter-spacing:2px;margin-bottom:8px}
+.result-body{font-family:var(--font-serif);font-size:15px;color:var(--muted);line-height:1.7}
+.result-bits{font-family:var(--font-display);font-size:28px;color:var(--magenta);margin:12px 0}
+/* FAQ */
+.faq-section{margin-top:40px;border-top:1px solid var(--border);padding-top:28px}
+.faq-title{font-family:var(--font-display);font-size:14px;letter-spacing:3px;color:var(--muted);margin-bottom:16px;text-transform:uppercase}
+.faq-item{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}.faq-item:last-child{border-bottom:none;margin-bottom:0}
+.faq-q{font-size:13px;font-weight:500;color:var(--white);margin-bottom:6px}.faq-a{font-family:var(--font-serif);font-size:14px;color:var(--muted);line-height:1.7}
+footer{border-top:1px solid var(--border);padding:20px 28px;display:flex;justify-content:space-between;align-items:center;margin-top:40px;flex-wrap:wrap;gap:10px}
+.footer-logo{font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-decoration:none}.footer-logo span{color:var(--magenta)}
+.footer-copy{font-size:11px;color:var(--dim)}.footer-links{display:flex;gap:16px}
+.footer-links a{font-size:10px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;text-decoration:none;transition:color .15s}.footer-links a:hover{color:var(--cyan)}
+@media(max-width:500px){.mp-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/index.html" class="nav-logo">HADAMARD<span>.app</span></a>
+  <a href="/algorithms.html" class="nav-back">← All Tools</a>
+</nav>
+<div class="page-wrap">
+  <div class="page-badge">⇌ Quantum Protocol</div>
+  <h1>SUPERDENSE <em>CODING</em></h1>
+  <p class="page-sub">Alice wants to send Bob 2 classical bits. She only sends 1 qubit. This is possible because they share a pre-entangled Bell pair — and it's the inverse of quantum teleportation.</p>
+
+  <div class="msg-picker">
+    <div class="mp-label">Alice's message — choose 2 bits to send</div>
+    <div class="mp-grid">
+      <button class="msg-btn active" onclick="selectMsg('00','I (Identity)',this)">
+        <div class="msg-bits">00</div><div class="msg-gate">Gate: I (none)</div>
+      </button>
+      <button class="msg-btn" onclick="selectMsg('01','X gate',this)">
+        <div class="msg-bits">01</div><div class="msg-gate">Gate: X (bit flip)</div>
+      </button>
+      <button class="msg-btn" onclick="selectMsg('10','Z gate',this)">
+        <div class="msg-bits">10</div><div class="msg-gate">Gate: Z (phase flip)</div>
+      </button>
+      <button class="msg-btn" onclick="selectMsg('11','iY (XZ)',this)">
+        <div class="msg-bits">11</div><div class="msg-gate">Gate: iY = XZ</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn primary" onclick="nextStep()">▶ Next Step</button>
+    <button class="ctrl-btn" onclick="resetSim()">↺ Reset</button>
+  </div>
+
+  <div class="protocol-flow" id="protocol-flow"></div>
+
+  <div class="result-card" id="result-card">
+    <div class="result-icon">⇌</div>
+    <div class="result-title">MESSAGE RECEIVED</div>
+    <div class="result-bits" id="result-bits">00</div>
+    <div class="result-body" id="result-body">Bob performed a Bell measurement and recovered Alice's 2-bit message perfectly — using only 1 transmitted qubit. Pre-shared entanglement doubled the channel capacity.</div>
+  </div>
+
+  <div class="faq-section">
+    <div class="faq-title">Understanding Superdense Coding</div>
+    <div class="faq-item">
+      <div class="faq-q">Doesn't this violate the Holevo bound?</div>
+      <div class="faq-a">No — the Holevo bound limits how much classical information can be retrieved from n qubits without pre-shared entanglement. Superdense coding uses 1 qubit plus 1 ebit (pre-shared entanglement) to transmit 2 bits. The ebit is a resource established in advance. Entanglement-assisted capacity is a different regime from unassisted capacity.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Why can't Alice just encode 2 bits into 1 qubit without entanglement?</div>
+      <div class="faq-a">The 4 gates Alice applies (I, X, Z, XZ) each transform the shared Bell state into a different orthogonal Bell state. Bob can perform a Bell measurement — which distinguishes between all 4 Bell states — because he holds the other half of the pair. Without entanglement, you can only distinguish 2 orthogonal states in 1 qubit, so you can only transmit 1 classical bit.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What's the relationship to quantum teleportation?</div>
+      <div class="faq-a">They're inverses of each other. Teleportation: 1 qubit transmitted + 2 classical bits sent + 1 shared ebit → transfers 1 qubit of quantum information. Superdense coding: 1 qubit transmitted + 1 shared ebit → transfers 2 classical bits. Both exploit the same pre-shared Bell pair resource — they just use it in opposite directions.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Has superdense coding been demonstrated experimentally?</div>
+      <div class="faq-a">Yes — first demonstrated experimentally in 1996 (Mattle, Weinfurter, Kwiat, Zeilinger) using entangled photons. It has since been demonstrated in various physical systems. The fundamental limitation in practice is the difficulty of maintaining entanglement (distributing Bell pairs) over long distances, which is the subject of quantum networking research.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="/index.html" class="footer-logo">HADAMARD<span>.app</span></a>
+  <div class="footer-copy">© 2026 hadamard.app</div>
+  <div class="footer-links"><a href="/quantum-teleportation.html">Teleportation</a><a href="/quantum-entanglement.html">Entanglement</a><a href="/algorithms.html">All Tools</a></div>
+</footer>
+
+<script>
+let curMsg = '00';
+let curGate = 'I (Identity)';
+let curStep = 0;
+
+// Bell state definitions after Alice's encoding
+const BELL_AFTER = {
+  '00': { state:'|Φ⁺⟩ = (|00⟩+|11⟩)/√2', result:'00', desc:'No gate applied. Bell state remains |Φ⁺⟩.' },
+  '01': { state:'|Ψ⁺⟩ = (|01⟩+|10⟩)/√2', result:'01', desc:'X gate flipped Alice\'s qubit, transforming |Φ⁺⟩ → |Ψ⁺⟩.' },
+  '10': { state:'|Φ⁻⟩ = (|00⟩−|11⟩)/√2', result:'10', desc:'Z gate added phase, transforming |Φ⁺⟩ → |Φ⁻⟩.' },
+  '11': { state:'|Ψ⁻⟩ = (|01⟩−|10⟩)/√2', result:'11', desc:'XZ gate applied, transforming |Φ⁺⟩ → |Ψ⁻⟩.' },
+};
+
+const STEPS_DEF = [
+  {
+    id:'setup', title:'Setup: Create Bell Pair', badge:'badge-shared', badgeText:'Shared Resource',
+    state:'|Φ⁺⟩ = (|00⟩+|11⟩)/√2',
+    explain:'Before the protocol, Alice and Bob create an entangled Bell pair (|00⟩+|11⟩)/√2. Alice keeps qubit A (left), Bob keeps qubit B (right). The qubits can now be physically separated — Bob takes his qubit anywhere.'
+  },
+  {
+    id:'encode', title:'Alice Encodes Her Message', badge:'badge-alice', badgeText:'Alice',
+    state: () => BELL_AFTER[curMsg].state,
+    explain: () => `Alice wants to send the message "${curMsg}". She applies the gate "${curGate}" to her qubit only. This transforms the Bell state into a different one: ${BELL_AFTER[curMsg].desc} She then sends her qubit to Bob over a quantum channel.`
+  },
+  {
+    id:'decode', title:'Bob Decodes: Bell Measurement', badge:'badge-bob', badgeText:'Bob',
+    state: () => `Measurement outcome: |${BELL_AFTER[curMsg].result}⟩`,
+    explain: () => `Bob now holds both qubits. He performs a Bell measurement — CNOT (A→B) then H on A, then measure both. Each Bell state gives a unique 2-bit measurement outcome. For ${BELL_AFTER[curMsg].state.split('=')[0].trim()}, the outcome is always "${BELL_AFTER[curMsg].result}". Bob reads the two bits and recovers Alice's message.`
+  }
+];
+
+function selectMsg(bits, gate, btn) {
+  curMsg = bits; curGate = gate;
+  document.querySelectorAll('.msg-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  resetSim();
+}
+
+function resetSim() {
+  curStep = 0;
+  document.getElementById('result-card').classList.remove('show');
+  renderFlow();
+}
+
+function nextStep() {
+  if (curStep < STEPS_DEF.length) {
+    curStep++;
+    renderFlow();
+  }
+  if (curStep === STEPS_DEF.length) {
+    const rc = document.getElementById('result-card');
+    rc.classList.add('show');
+    document.getElementById('result-bits').textContent = curMsg;
+    document.getElementById('result-body').textContent = `Bob performed a Bell measurement and decoded the message "${curMsg}" — transmitted using only 1 qubit. Pre-shared entanglement doubled the effective channel capacity.`;
+  }
+}
+
+function renderFlow() {
+  const container = document.getElementById('protocol-flow');
+  container.innerHTML = STEPS_DEF.map((s, i)=>{
+    const stepIdx = i + 1;
+    const isDone = stepIdx < curStep;
+    const isActive = stepIdx === curStep;
+    const isPending = stepIdx > curStep;
+    const cls = isActive ? 'active-step' : isDone ? 'done-step' : '';
+    const numCls = isActive ? 'active' : isDone ? 'done' : 'pending';
+    const numIcon = isDone ? '✓' : stepIdx;
+
+    const stateText = typeof s.state === 'function' ? s.state() : s.state;
+    const explainText = typeof s.explain === 'function' ? s.explain() : s.explain;
+
+    return `<div class="proto-step ${cls}">
+      <div class="ps-head">
+        <div class="ps-num ${numCls}">${numIcon}</div>
+        <div class="ps-title">${s.title}</div>
+        <div class="ps-badge ${s.badge}">${s.badgeText}</div>
+      </div>
+      <div class="ps-body">
+        <div class="ps-state">${stateText}</div>
+        <div class="ps-explain">${explainText}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+resetSim();
+</script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Teleportation Simulator — Step-by-Step Interactive Demo | Hadamard</title>
+<meta name="description" content="Interactive quantum teleportation simulator. Watch Alice transmit a qubit state to Bob using a Bell pair and classical communication — step by step, with real quantum state math.">
+<meta name="keywords" content="quantum teleportation simulator, quantum teleportation explained, quantum teleportation interactive, how quantum teleportation works, bell pair teleportation">
+<link rel="canonical" href="https://hadamard.app/quantum-teleportation.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Quantum Teleportation Simulator","url":"https://hadamard.app/quantum-teleportation.html","applicationCategory":"EducationalApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Orbitron:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#02020a;--surface:#080814;--surface2:#0e0e1e;--border:#1a1a30;--border2:#242440;--cyan:#00e5ff;--cyan-dim:rgba(0,229,255,.08);--magenta:#ff00aa;--green:#00ff9d;--white:#e8f0ff;--muted:#5a6080;--dim:#2a2d40;--purple:#a855f7;--font-display:'Orbitron',monospace;--font-body:'DM Mono',monospace;--font-serif:'Crimson Pro',Georgia,serif}
+body{background:var(--bg);color:var(--white);font-family:var(--font-body);font-size:13px;min-height:100vh}
+a{color:var(--cyan);text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;border-bottom:1px solid var(--border);background:rgba(2,2,10,.92);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+.nav-logo{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-decoration:none}.nav-logo span{color:var(--magenta)}
+.nav-back{font-size:10px;letter-spacing:1.5px;color:var(--muted);border:1px solid var(--border2);padding:5px 10px;border-radius:2px;text-decoration:none;transition:all .15s}.nav-back:hover{color:var(--cyan);border-color:var(--cyan)}
+.page-wrap{max-width:900px;margin:0 auto;padding:40px 24px 80px}
+.page-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(0,229,255,.2);border-radius:2px;padding:3px 10px;font-size:9px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;margin-bottom:12px;background:var(--cyan-dim)}
+h1{font-family:var(--font-display);font-size:clamp(22px,4vw,38px);font-weight:900;letter-spacing:2px;color:var(--white);line-height:1;margin-bottom:8px}h1 em{color:var(--cyan);font-style:normal}
+.page-sub{font-family:var(--font-serif);font-style:italic;color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:32px}
+/* STATE PICKER */
+.state-picker{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:20px 24px;margin-bottom:20px}
+.sp-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.sp-options{display:flex;gap:8px;flex-wrap:wrap}
+.sp-btn{padding:8px 16px;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;color:var(--muted);font-family:var(--font-body);font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .12s}
+.sp-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.sp-btn.active{border-color:var(--magenta);color:var(--magenta);background:rgba(255,0,170,.08)}
+/* STEP CONTROLS */
+.controls{display:flex;gap:10px;margin-bottom:24px;align-items:center;flex-wrap:wrap}
+.ctrl-btn{padding:9px 18px;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;color:var(--muted);font-family:var(--font-body);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .12s}
+.ctrl-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.ctrl-btn.primary{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:500}
+.ctrl-btn.primary:hover{background:#fff}
+.step-indicator{font-size:10px;letter-spacing:1.5px;color:var(--muted);margin-left:8px}
+/* CIRCUIT DISPLAY */
+.circuit-card{background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:20px}
+.circuit-card::before{content:'';display:block;height:2px;background:linear-gradient(90deg,var(--magenta),var(--cyan))}
+.circuit-visual{padding:24px;overflow-x:auto}
+.cv{font-family:var(--font-body);font-size:12px;line-height:2.2}
+.cv-row{display:flex;align-items:center;gap:0;margin-bottom:4px;white-space:nowrap}
+.cv-lbl{width:72px;color:var(--muted);font-size:11px;flex-shrink:0}
+.cv-wire{display:flex;align-items:center;flex:1}
+.step-cell{width:56px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+.wire-seg{width:56px;height:2px;background:var(--border2);flex-shrink:0}
+.gate-box{width:34px;height:34px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2px solid;position:absolute;z-index:1;transition:all .2s}
+.gate-box.active{box-shadow:0 0 14px currentColor}
+.g-H{border-color:#00e5ff;color:#00e5ff;background:rgba(0,229,255,.1)}
+.g-CNOT-ctrl{border-color:var(--purple);color:var(--purple);background:rgba(168,85,247,.1);border-radius:50%;width:24px;height:24px;font-size:16px}
+.g-CNOT-tgt{border-color:var(--purple);color:var(--purple);background:rgba(168,85,247,.1);font-size:20px}
+.g-M{border-color:var(--green);color:var(--green);background:rgba(0,255,157,.1);font-size:18px}
+.g-X{border-color:#ff6b6b;color:#ff6b6b;background:rgba(255,107,107,.1)}
+.g-Z{border-color:#6bcb77;color:#6bcb77;background:rgba(107,203,119,.1)}
+.cnot-line{width:2px;background:var(--purple);opacity:.4}
+.classical-wire{height:2px;background:repeating-linear-gradient(90deg,var(--muted) 0,var(--muted) 4px,transparent 4px,transparent 8px)}
+/* STATE DISPLAY */
+.state-display{background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:20px}
+.sd-head{display:flex;gap:0;border-bottom:1px solid var(--border)}
+.sd-tab{flex:1;padding:10px 16px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:center;border-right:1px solid var(--border)}
+.sd-tab:last-child{border-right:none}
+.sd-tab.active{color:var(--cyan);background:var(--cyan-dim)}
+.sd-body{padding:20px 24px}
+.state-eq{font-size:14px;color:var(--cyan);line-height:1.8;margin-bottom:12px}
+.state-explain{font-family:var(--font-serif);font-size:15px;color:var(--muted);line-height:1.7}
+/* NARRATIVE */
+.narrative-card{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:20px 24px;margin-bottom:20px}
+.narrative-step{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:8px}
+.narrative-title{font-family:var(--font-display);font-size:14px;color:var(--white);margin-bottom:10px;font-weight:700;letter-spacing:1px}
+.narrative-body{font-family:var(--font-serif);font-size:15px;color:rgba(232,240,255,.7);line-height:1.7}
+/* RESULT */
+.result-card{background:var(--surface);border:1px solid rgba(0,255,157,.3);border-radius:4px;padding:24px;text-align:center;display:none}
+.result-card.show{display:block}
+.result-icon{font-size:32px;margin-bottom:12px}
+.result-title{font-family:var(--font-display);font-size:16px;color:var(--green);letter-spacing:2px;margin-bottom:8px}
+.result-body{font-family:var(--font-serif);font-size:15px;color:var(--muted);line-height:1.7}
+/* FAQ */
+.faq-section{margin-top:40px;border-top:1px solid var(--border);padding-top:28px}
+.faq-title{font-family:var(--font-display);font-size:14px;letter-spacing:3px;color:var(--muted);margin-bottom:16px;text-transform:uppercase}
+.faq-item{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}.faq-item:last-child{border-bottom:none;margin-bottom:0}
+.faq-q{font-size:13px;font-weight:500;color:var(--white);margin-bottom:6px}.faq-a{font-family:var(--font-serif);font-size:14px;color:var(--muted);line-height:1.7}
+footer{border-top:1px solid var(--border);padding:20px 28px;display:flex;justify-content:space-between;align-items:center;margin-top:40px;flex-wrap:wrap;gap:10px}
+.footer-logo{font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-decoration:none}.footer-logo span{color:var(--magenta)}
+.footer-copy{font-size:11px;color:var(--dim)}.footer-links{display:flex;gap:16px}
+.footer-links a{font-size:10px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;text-decoration:none;transition:color .15s}.footer-links a:hover{color:var(--cyan)}
+@media(max-width:600px){.controls{flex-direction:column;align-items:stretch}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/index.html" class="nav-logo">HADAMARD<span>.app</span></a>
+  <a href="/algorithms.html" class="nav-back">← All Tools</a>
+</nav>
+<div class="page-wrap">
+  <div class="page-badge">✦ Quantum Protocol</div>
+  <h1>QUANTUM <em>TELEPORTATION</em></h1>
+  <p class="page-sub">Alice transmits the full state of a qubit to Bob using only a pre-shared Bell pair and two classical bits — no quantum channel needed after setup. Step through the full protocol with real quantum state math.</p>
+
+  <!-- STATE PICKER -->
+  <div class="state-picker">
+    <div class="sp-label">Choose Alice's qubit to teleport</div>
+    <div class="sp-options">
+      <button class="sp-btn active" onclick="selectState('|0⟩',1,0,this)">|0⟩ — ground state</button>
+      <button class="sp-btn" onclick="selectState('|1⟩',0,1,this)">|1⟩ — excited state</button>
+      <button class="sp-btn" onclick="selectState('|+⟩',0.707,0.707,this)">|+⟩ — superposition</button>
+      <button class="sp-btn" onclick="selectState('|−⟩',0.707,-0.707,this)">|−⟩ — phased superposition</button>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <button class="ctrl-btn primary" onclick="nextStep()">▶ Next Step</button>
+    <button class="ctrl-btn" onclick="prevStep()">← Back</button>
+    <button class="ctrl-btn" onclick="resetSim()">↺ Reset</button>
+    <span class="step-indicator" id="step-indicator">Step 0 of 6</span>
+  </div>
+
+  <!-- CIRCUIT VISUAL -->
+  <div class="circuit-card">
+    <div class="circuit-visual" id="circuit-visual"></div>
+  </div>
+
+  <!-- NARRATIVE -->
+  <div class="narrative-card" id="narrative-card">
+    <div class="narrative-step" id="narrative-step">STEP 0</div>
+    <div class="narrative-title" id="narrative-title">Initial State</div>
+    <div class="narrative-body" id="narrative-body">Select Alice's qubit above and press Next Step to begin the teleportation protocol.</div>
+  </div>
+
+  <!-- STATE DISPLAY -->
+  <div class="state-display">
+    <div class="sd-head">
+      <div class="sd-tab active">3-Qubit State</div>
+      <div class="sd-tab">Alice's Bits</div>
+      <div class="sd-tab">Bob's Qubit</div>
+    </div>
+    <div class="sd-body">
+      <div class="state-eq" id="state-eq">|ψ₀⟩ ⊗ |00⟩</div>
+      <div class="state-explain" id="state-explain">Alice holds qubit Q0 (the state to teleport) and Q1 (her half of the Bell pair). Bob holds Q2 (his half of the Bell pair). All qubits initialized.</div>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="result-card" id="result-card">
+    <div class="result-icon">✦</div>
+    <div class="result-title">TELEPORTATION COMPLETE</div>
+    <div class="result-body" id="result-body">Bob's qubit is now in exactly the state Alice started with. No quantum information traveled through a classical channel — only two classical bits were sent. The original qubit was destroyed in Alice's Bell measurement.</div>
+  </div>
+
+  <div class="faq-section">
+    <div class="faq-title">Understanding Teleportation</div>
+    <div class="faq-item">
+      <div class="faq-q">Is this faster-than-light communication?</div>
+      <div class="faq-a">No. Alice must send Bob two classical bits — which travel at most at light speed — telling him which correction to apply. Without those two bits, Bob has no idea what state he should have. The quantum correlation is instantaneous, but it carries no usable information until combined with the classical message.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Does the original qubit get cloned?</div>
+      <div class="faq-a">No — the no-cloning theorem prevents it. Alice's Bell measurement destroys the original qubit's quantum information. After teleportation, only Bob's qubit holds the state. The state was transferred, not copied.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What are the two classical bits for?</div>
+      <div class="faq-a">Alice's Bell measurement gives two classical bits (00, 01, 10, or 11). Each result tells Bob which gate to apply to his qubit to complete the correction: 00 = do nothing, 01 = apply X, 10 = apply Z, 11 = apply both XZ. Without knowing which result Alice got, Bob can't recover the state.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Has quantum teleportation been demonstrated experimentally?</div>
+      <div class="faq-a">Yes — first demonstrated in 1997 (Bouwmeester et al.) for photon polarization states. Since then it has been demonstrated over increasing distances, culminating in satellite-based teleportation over 1,400 km (China's Micius satellite, 2017). Teleportation of more complex states including superpositions and entangled states has also been demonstrated.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="/index.html" class="footer-logo">HADAMARD<span>.app</span></a>
+  <div class="footer-copy">© 2026 hadamard.app</div>
+  <div class="footer-links"><a href="/quantum-circuit.html">Circuit Sim</a><a href="/superdense-coding.html">Superdense Coding</a><a href="/learn/bell-states.html">Bell States</a></div>
+</footer>
+
+<script>
+// ── STATE ──
+let curStep = 0;
+let stateAlpha = 1, stateBeta = 0, stateName = '|0⟩';
+
+const STEPS = [
+  {
+    title: "Initial State",
+    narr: "Alice has qubit Q0 in state |ψ₀⟩ = α|0⟩ + β|1⟩ — the state she wants to teleport. Qubits Q1 and Q2 are both in |0⟩. Q1 and Q2 will become an entangled Bell pair shared between Alice and Bob.",
+    stateEq: () => `α|000⟩ + β|100⟩`,
+    stateExp: () => `Alice's qubit (Q0) is in state α|0⟩+β|1⟩. Q1 and Q2 are |0⟩. The full 3-qubit state is the tensor product.`,
+    active: []
+  },
+  {
+    title: "Create Bell Pair (H on Q1)",
+    narr: "A Hadamard gate is applied to Q1, putting it in superposition: (|0⟩+|1⟩)/√2. This is the first step in creating the shared Bell pair between Alice (Q1) and Bob (Q2).",
+    stateEq: () => `(α|0⟩+β|1⟩) ⊗ (|00⟩+|10⟩)/√2`,
+    stateExp: () => `Q1 is now in superposition. Q0 still holds Alice's state. Q2 is still |0⟩.`,
+    active: [{step:0, qubit:1, type:'H'}]
+  },
+  {
+    title: "Entangle Q1 and Q2 (CNOT)",
+    narr: "A CNOT gate with Q1 as control and Q2 as target creates the Bell pair (|00⟩+|11⟩)/√2 across Q1 and Q2. This is the shared entangled resource — Alice keeps Q1, Bob takes Q2.",
+    stateEq: () => `(α|0⟩+β|1⟩) ⊗ (|00⟩+|11⟩)/√2`,
+    stateExp: () => `Q1 and Q2 are now entangled — the Bell state |Φ⁺⟩. Alice holds Q0 and Q1. Bob takes Q2 to his location (which can be anywhere).`,
+    active: [{step:1, qubit:1, type:'CNOT-ctrl'},{step:1, qubit:2, type:'CNOT-tgt'}]
+  },
+  {
+    title: "Alice's CNOT (Q0 → Q1)",
+    narr: "Alice applies a CNOT with her qubit Q0 as control and Q1 as target. This begins the Bell measurement — it entangles the qubit-to-be-teleported with her half of the Bell pair.",
+    stateEq: () => `½[|00⟩(α|0⟩+β|1⟩) + |01⟩(α|1⟩+β|0⟩) + |10⟩(α|0⟩−β|1⟩) + |11⟩(α|1⟩−β|0⟩)]`,
+    stateExp: () => `The state is now a superposition of all four Bell outcomes. Each outcome (|00⟩, |01⟩, |10⟩, |11⟩) for Alice's qubits leaves Bob's qubit in a different state.`,
+    active: [{step:2, qubit:0, type:'CNOT-ctrl'},{step:2, qubit:1, type:'CNOT-tgt'}]
+  },
+  {
+    title: "Alice's Hadamard (Q0)",
+    narr: "Alice applies H to her qubit Q0. Together, the CNOT and this H form a Bell measurement — they rotate the entangled state into the Bell basis so it can be measured.",
+    stateEq: () => `½[|00⟩(α|0⟩+β|1⟩) + |01⟩(β|0⟩+α|1⟩) + |10⟩(α|0⟩−β|1⟩) + |11⟩(−β|0⟩+α|1⟩)]`,
+    stateExp: () => `Now each two-bit outcome for Alice (Q0, Q1) uniquely determines Bob's state. Alice is ready to measure.`,
+    active: [{step:3, qubit:0, type:'H'}]
+  },
+  {
+    title: "Alice Measures (Q0, Q1)",
+    narr: "Alice measures both her qubits. She gets a random 2-bit result: 00, 01, 10, or 11 — each with 25% probability. She sends these two classical bits to Bob over an ordinary channel.",
+    stateEq: () => `Outcome 00: Bob has α|0⟩+β|1⟩ = |ψ₀⟩\nOutcome 01: Bob has β|0⟩+α|1⟩ → apply X\nOutcome 10: Bob has α|0⟩−β|1⟩ → apply Z\nOutcome 11: Bob has −β|0⟩+α|1⟩ → apply XZ`,
+    stateExp: () => `Each outcome leaves Bob's qubit in a specific state related to the original. Alice tells Bob which outcome she got via a classical message.`,
+    active: [{step:4, qubit:0, type:'M'},{step:4, qubit:1, type:'M'}]
+  },
+  {
+    title: "Bob Corrects — Teleportation Complete",
+    narr: "Bob receives Alice's 2 classical bits and applies the correction gate: nothing (00), X (01), Z (10), or ZX (11). After correction, Bob's qubit is in exactly the state Alice started with — α|0⟩+β|1⟩.",
+    stateEq: () => `Bob's qubit: α|0⟩ + β|1⟩ = ${stateName} ✓`,
+    stateExp: () => `Teleportation is complete. Bob holds ${stateName} — exactly what Alice started with. The original qubit was destroyed. No quantum information traveled classically — only the 2-bit correction key did.`,
+    active: [{step:5, qubit:2, type:'X'},{step:5, qubit:2, type:'Z'}]
+  }
+];
+
+function selectState(name, alpha, beta, btn) {
+  stateName = name; stateAlpha = alpha; stateBeta = beta;
+  document.querySelectorAll('.sp-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  resetSim();
+}
+
+function resetSim() {
+  curStep = 0;
+  document.getElementById('result-card').classList.remove('show');
+  updateUI();
+}
+
+function nextStep() {
+  if (curStep < STEPS.length - 1) { curStep++; updateUI(); }
+  if (curStep === STEPS.length - 1) {
+    document.getElementById('result-card').classList.add('show');
+    document.getElementById('result-body').textContent = `Bob's qubit is now in state ${stateName} = α|0⟩+β|1⟩ — exactly the state Alice started with. Only 2 classical bits were communicated after the Bell pair was pre-shared.`;
+  }
+}
+
+function prevStep() {
+  if (curStep > 0) { curStep--; document.getElementById('result-card').classList.remove('show'); updateUI(); }
+}
+
+function updateUI() {
+  const step = STEPS[curStep];
+  document.getElementById('step-indicator').textContent = `Step ${curStep} of ${STEPS.length - 1}`;
+  document.getElementById('narrative-step').textContent = `STEP ${curStep}`;
+  document.getElementById('narrative-title').textContent = step.title;
+  document.getElementById('narrative-body').textContent = step.narr;
+  document.getElementById('state-eq').textContent = step.stateEq();
+  document.getElementById('state-explain').textContent = step.stateExp();
+  renderCircuit();
+}
+
+function renderCircuit() {
+  const step = STEPS[curStep];
+  const activeSet = new Set(step.active.map(a=>`${a.step},${a.qubit}`));
+
+  // Gate layout: step 0=H(Q1), step1=CNOT(Q1,Q2), step2=CNOT(Q0,Q1), step3=H(Q0), step4=M(Q0),M(Q1), step5=X/Z(Q2)
+  const layout = [
+    [{q:1,t:'H'},{q:null},{q:null}],         // step 0
+    [{q:1,t:'ctrl'},{q:2,t:'tgt'},{q:null}], // step 1
+    [{q:0,t:'ctrl'},{q:1,t:'tgt'},{q:null}], // step 2
+    [{q:0,t:'H'},{q:null},{q:null}],          // step 3
+    [{q:0,t:'M'},{q:1,t:'M'},{q:null}],       // step 4
+    [{q:null},{q:null},{q:2,t:'X+Z'}],        // step 5
+  ];
+
+  const qubitLabels = ['Q0 (Alice)', 'Q1 (Alice)', 'Q2 (Bob)'];
+  const qubitColors = [
+    { wire:'rgba(255,0,170,.3)', label:'color:var(--magenta)' },
+    { wire:'rgba(255,0,170,.3)', label:'color:var(--magenta)' },
+    { wire:'rgba(0,229,255,.3)', label:'color:var(--cyan)' }
+  ];
+
+  let html = '<div class="cv">';
+
+  for (let q = 0; q < 3; q++) {
+    html += `<div class="cv-row">`;
+    html += `<div class="cv-lbl" style="${qubitColors[q].label}">${qubitLabels[q]}</div>`;
+    html += `<div class="cv-wire">`;
+    html += `<div class="wire-seg" style="background:${qubitColors[q].wire}"></div>`;
+
+    for (let s = 0; s < layout.length; s++) {
+      const gatesInStep = layout[s].filter(g=>g.q===q);
+      const isActive = s < curStep || (s === curStep && step.active.some(a=>a.qubit===q));
+      const isCurrent = s === curStep - 1;
+
+      html += `<div class="step-cell">`;
+      html += `<div class="wire-seg" style="background:${isActive?qubitColors[q].wire:'var(--border2)'}"></div>`;
+
+      if (gatesInStep.length > 0) {
+        const g = gatesInStep[0];
+        const act = isActive ? ' active' : '';
+        if (g.t==='H') html += `<div class="gate-box g-H${act}" title="Hadamard">H</div>`;
+        else if (g.t==='ctrl') html += `<div class="gate-box g-CNOT-ctrl${act}" title="CNOT Control">●</div>`;
+        else if (g.t==='tgt') html += `<div class="gate-box g-CNOT-tgt${act}" title="CNOT Target">⊕</div>`;
+        else if (g.t==='M') html += `<div class="gate-box g-M${act}" title="Measure">⊛</div>`;
+        else if (g.t==='X+Z') html += `<div class="gate-box g-X${act}" style="font-size:10px" title="Correction">XZ</div>`;
+      }
+
+      html += `</div>`;
+      html += `<div class="wire-seg" style="background:${isActive?qubitColors[q].wire:'var(--border2)'}"></div>`;
+    }
+
+    html += `</div></div>`;
+  }
+
+  html += '</div>';
+  document.getElementById('circuit-visual').innerHTML = html;
+}
+
+// Init
+selectState('|0⟩', 1, 0, document.querySelector('.sp-btn'));
+</script>
+</body>
+</html>

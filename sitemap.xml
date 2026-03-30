@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://hadamard.app/</loc><priority>1.0</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://hadamard.app/quantum-circuit.html</loc><priority>0.95</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/quantum-bloch.html</loc><priority>0.85</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/quantum-entanglement.html</loc><priority>0.85</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/quantum-qkd.html</loc><priority>0.85</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/quantum-grover.html</loc><priority>0.85</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/quantum-qrng.html</loc><priority>0.85</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/algorithms.html</loc><priority>0.90</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/quantum-gates.html</loc><priority>0.85</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/quantum-teleportation.html</loc><priority>0.85</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/deutsch-jozsa.html</loc><priority>0.80</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/quantum-error-correction.html</loc><priority>0.80</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/superdense-coding.html</loc><priority>0.80</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/learn/what-is-a-qubit.html</loc><priority>0.80</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/learn/hadamard-gate.html</loc><priority>0.80</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/learn/quantum-superposition.html</loc><priority>0.75</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/learn/quantum-entanglement.html</loc><priority>0.75</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/learn/bell-states.html</loc><priority>0.75</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://hadamard.app/learn/bb84-protocol.html</loc><priority>0.75</priority><changefreq>monthly</changefreq></url>
+</urlset>

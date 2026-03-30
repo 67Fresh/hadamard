@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Quantum Computing Simulators & Tools — All Algorithms | Hadamard</title>
+<meta name="description" content="Every free quantum computing tool on Hadamard.app — circuit simulator, Bloch sphere, Bell states, BB84 cryptography, Grover's algorithm, quantum teleportation, and more. No sign-up required.">
+<meta name="keywords" content="quantum computing simulator online free, quantum algorithms online, quantum circuit simulator, bloch sphere visualizer, grover algorithm simulator, quantum cryptography simulator">
+<link rel="canonical" href="https://hadamard.app/algorithms.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Quantum Computing Tools","description":"Free browser-based quantum computing simulators and educational tools","url":"https://hadamard.app/algorithms.html","publisher":{"@type":"Organization","name":"Hadamard","url":"https://hadamard.app"}}</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Orbitron:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#02020a;--surface:#080814;--surface2:#0e0e1e;--border:#1a1a30;--border2:#242440;--cyan:#00e5ff;--cyan-dim:rgba(0,229,255,.08);--magenta:#ff00aa;--green:#00ff9d;--gold:#e8c84a;--orange:#ff9f43;--white:#e8f0ff;--muted:#5a6080;--dim:#2a2d40;--font-display:'Orbitron',monospace;--font-body:'DM Mono',monospace;--font-serif:'Crimson Pro',Georgia,serif}
+body{background:var(--bg);color:var(--white);font-family:var(--font-body);font-size:13px}
+a{color:var(--cyan);text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;border-bottom:1px solid var(--border);background:rgba(2,2,10,.95);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+.nav-logo{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-decoration:none}.nav-logo span{color:var(--magenta)}
+.nav-links{display:flex;gap:24px}.nav-links a{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;text-decoration:none;transition:color .15s}.nav-links a:hover{color:var(--cyan)}
+.nav-back{font-size:10px;letter-spacing:1.5px;color:var(--muted);border:1px solid var(--border2);padding:5px 10px;border-radius:2px;text-decoration:none;transition:all .15s}.nav-back:hover{color:var(--cyan);border-color:var(--cyan)}
+.page-wrap{max-width:1100px;margin:0 auto;padding:60px 24px 80px}
+.page-head{max-width:640px;margin-bottom:56px}
+.page-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(0,229,255,.2);border-radius:2px;padding:3px 10px;font-size:9px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;margin-bottom:16px;background:var(--cyan-dim)}
+h1{font-family:var(--font-display);font-size:clamp(22px,4vw,40px);font-weight:900;letter-spacing:2px;color:var(--white);line-height:1.05;margin-bottom:12px}
+h1 em{color:var(--cyan);font-style:normal}
+.page-sub{font-family:var(--font-serif);font-style:italic;color:var(--muted);font-size:16px;line-height:1.6}
+.section-label{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:56px}
+.tool-card{background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow:hidden;text-decoration:none;transition:border-color .15s,transform .1s;display:flex;flex-direction:column}
+.tool-card:hover{border-color:var(--cyan);transform:translateY(-2px)}
+.tool-card-top{padding:24px 24px 0;position:relative}
+.tool-accent{width:100%;height:2px;position:absolute;top:0;left:0;border-radius:2px 2px 0 0}
+.tool-icon{font-size:24px;margin-bottom:12px}
+.tool-name{font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:1.5px;color:var(--white);margin-bottom:8px}
+.tool-desc{font-family:var(--font-serif);font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.tool-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;padding:0 24px}
+.tool-tag{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:2px;border:1px solid var(--border);color:var(--muted)}
+.tool-footer{padding:12px 24px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2)}
+.tool-status{font-size:9px;letter-spacing:1.5px;text-transform:uppercase}
+.status-live{color:var(--green)}
+.status-new{color:var(--gold)}
+.tool-arrow{color:var(--muted);font-size:14px;transition:color .15s}
+.tool-card:hover .tool-arrow{color:var(--cyan)}
+.learn-section{margin-top:16px}
+.learn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.learn-item{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:16px 18px;text-decoration:none;transition:border-color .15s}
+.learn-item:hover{border-color:var(--cyan)}
+.learn-item-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.learn-item-title{font-family:var(--font-serif);font-size:15px;color:var(--white);line-height:1.3}
+footer{border-top:1px solid var(--border);padding:20px 28px;display:flex;justify-content:space-between;align-items:center;margin-top:40px;flex-wrap:wrap;gap:10px}
+.footer-logo{font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-decoration:none}.footer-logo span{color:var(--magenta)}
+.footer-copy{font-size:11px;color:var(--dim)}.footer-links{display:flex;gap:16px}
+.footer-links a{font-size:10px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;text-decoration:none;transition:color .15s}.footer-links a:hover{color:var(--cyan)}
+@media(max-width:700px){.tools-grid{grid-template-columns:1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/index.html" class="nav-logo">HADAMARD<span>.app</span></a>
+  <div class="nav-links"><a href="/algorithms.html">Tools</a><a href="/quantum-gates.html">Gates</a><a href="/learn/what-is-a-qubit.html">Learn</a></div>
+  <a href="/index.html" class="nav-back">← Home</a>
+</nav>
+<div class="page-wrap">
+  <div class="page-head">
+    <div class="page-badge">⚛ All Tools</div>
+    <h1>QUANTUM <em>TOOLS</em></h1>
+    <p class="page-sub">Every quantum computing simulator and visualizer on Hadamard.app — free, browser-based, no sign-up. Built for developers, students, and the curious.</p>
+  </div>
+
+  <div class="section-label">Simulators & Interactive Tools</div>
+  <div class="tools-grid">
+
+    <a href="/quantum-circuit.html" class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-accent" style="background:linear-gradient(90deg,#00e5ff,#ff00aa)"></div>
+        <div class="tool-icon">⚛</div>
+        <div class="tool-name">QUANTUM CIRCUIT SIMULATOR</div>
+        <p class="tool-desc">Drag and drop quantum gates onto qubit wires. Simulate any circuit with real matrix math. Preset circuits included: Bell state, Grover search, GHZ state, teleportation.</p>
+      </div>
+      <div class="tool-tags"><span class="tool-tag">H X Y Z S T CNOT</span><span class="tool-tag">Up to 5 qubits</span><span class="tool-tag">State vector</span></div>
+      <div class="tool-footer"><span class="tool-status status-live">● Live</span><span class="tool-arrow">→</span></div>
+    </a>
+
+    <a href="/quantum-bloch.html" class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-accent" style="background:linear-gradient(90deg,#48dbfb,#0abde3)"></div>
+        <div class="tool-icon">🌐</div>
+        <div class="tool-name">BLOCH SPHERE VISUALIZER</div>
+        <p class="tool-desc">3D interactive Bloch sphere. Apply any single-qubit gate and watch the state vector rotate in real time. Drag to rotate, zoom to inspect. Every gate is a rotation.</p>
+      </div>
+      <div class="tool-tags"><span class="tool-tag">3D interactive</span><span class="tool-tag">All single-qubit gates</span><span class="tool-tag">Real-time</span></div>
+      <div class="tool-footer"><span class="tool-status status-live">● Live</span><span class="tool-arrow">→</span></div>
+    </a>
+
+    <a href="/quantum-entanglement.html" class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-accent" style="background:linear-gradient(90deg,#a855f7,#7c3aed)"></div>
+        <div class="tool-icon">🔗</div>
+        <div class="tool-name">BELL STATE ENTANGLEMENT DEMO</div>
+        <p class="tool-desc">Create all four Bell states and measure them 100 times. See the perfect correlations — outcomes always match or always oppose, depending on the Bell state. The foundation of quantum protocols.</p>
+      </div>
+      <div class="tool-tags"><span class="tool-tag">All 4 Bell states</span><span class="tool-tag">100× simulation</span><span class="tool-tag">Live statistics</span></div>
+      <div class="tool-footer"><span class="tool-status status-live">● Live</span><span class="tool-arrow">→</span></div>
+    </a>
+
+    <a href="/quantum-qkd.html" class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-accent" style="background:linear-gradient(90deg,#00ff9d,#00b388)"></div>
+        <div class="tool-icon">🔐</div>
+        <div class="tool-name">BB84 QUANTUM CRYPTOGRAPHY</div>
+        <p class="tool-desc">Simulate the BB84 quantum key distribution protocol. Toggle eavesdropping on and off — watch Eve get detected by the laws of physics every single time. Security from nature, not math.</p>
+      </div>
+      <div class="tool-tags"><span class="tool-tag">Full BB84 protocol</span><span class="tool-tag">Eve detection</span><span class="tool-tag">Error rate</span></div>
+      <div class="tool-footer"><span class="tool-status status-live">● Live</span><span class="tool-arrow">→</span></div>
+    </a>
+
+    <a href="/quantum-grover.html" class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-accent" style="background:linear-gradient(90deg,#e8c84a,#f9a825)"></div>
+        <div class="tool-icon">🔍</div>
+        <div class="tool-name">GROVER'S ALGORITHM VISUALIZER</div>
+        <p class="tool-desc">Interactive amplitude amplification. Choose a database size, watch the target state emerge from superposition in √N steps. Classical vs quantum comparison shows the speedup directly.</p>
+      </div>
+      <div class="tool-tags"><span class="tool-tag">Amplitude amplification</span><span class="tool-tag">√N speedup</span><span class="tool-tag">Classical comparison</span></div>
+      <div class="tool-footer"><span class="tool-status status-live">● Live</span><span class="tool-arrow">→</span></div>
+    </a>
+
+    <a href="/quantum-qrng.html" class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-accent" style="background:linear-gradient(90deg,#ff9f43,#ee5a24)"></div>
+        <div class="tool-icon">🎲</div>
+        <div class="tool-name">QUANTUM RANDOM NUMBER GENERATOR</div>
+        <p class="tool-desc">True random numbers from quantum vacuum fluctuations via the ANU QRNG API. Not an algorithm — actual quantum physics. Certifiably random in a way no classical generator can match.</p>
+      </div>
+      <div class="tool-tags"><span class="tool-tag">ANU QRNG API</span><span class="tool-tag">True randomness</span><span class="tool-tag">Quantum vacuum</span></div>
+      <div class="tool-footer"><span class="tool-status status-live">● Live</span><span class="tool-arrow">→</span></div>
+    </a>
+
+    <a href="/quantum-teleportation.html" class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-accent" style="background:linear-gradient(90deg,#fd79a8,#e84393)"></div>
+        <div class="tool-icon">✦</div>
+        <div class="tool-name">QUANTUM TELEPORTATION</div>
+        <p class="tool-desc">Step-by-step simulation of quantum teleportation. Alice transmits a qubit state to Bob using a Bell pair and classical communication. Watch the state transfer — no matter, no faster-than-light.</p>
+      </div>
+      <div class="tool-tags"><span class="tool-tag">3-qubit circuit</span><span class="tool-tag">Step-by-step</span><span class="tool-tag">State transfer</span></div>
+      <div class="tool-footer"><span class="tool-status status-new">★ New</span><span class="tool-arrow">→</span></div>
+    </a>
+
+    <a href="/deutsch-jozsa.html" class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-accent" style="background:linear-gradient(90deg,#6bcb77,#4caf50)"></div>
+        <div class="tool-icon">∿</div>
+        <div class="tool-name">DEUTSCH-JOZSA ALGORITHM</div>
+        <p class="tool-desc">The first proof that quantum beats classical. Determine if a function is constant or balanced in one query — versus many classical queries. Choose the oracle type and watch interference do the work.</p>
+      </div>
+      <div class="tool-tags"><span class="tool-tag">Oracle-based</span><span class="tool-tag">Quantum speedup</span><span class="tool-tag">Interference</span></div>
+      <div class="tool-footer"><span class="tool-status status-new">★ New</span><span class="tool-arrow">→</span></div>
+    </a>
+
+    <a href="/superdense-coding.html" class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-accent" style="background:linear-gradient(90deg,#74b9ff,#0984e3)"></div>
+        <div class="tool-icon">⇌</div>
+        <div class="tool-name">SUPERDENSE CODING</div>
+        <p class="tool-desc">Send 2 classical bits using 1 qubit — made possible by pre-shared entanglement. The inverse of quantum teleportation. Choose your 2-bit message and watch the protocol encode and decode it.</p>
+      </div>
+      <div class="tool-tags"><span class="tool-tag">2 bits per qubit</span><span class="tool-tag">Bell pair</span><span class="tool-tag">Encoding/decoding</span></div>
+      <div class="tool-footer"><span class="tool-status status-new">★ New</span><span class="tool-arrow">→</span></div>
+    </a>
+
+    <a href="/quantum-error-correction.html" class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-accent" style="background:linear-gradient(90deg,#ff6b6b,#ee5a24)"></div>
+        <div class="tool-icon">🛡</div>
+        <div class="tool-name">QUANTUM ERROR CORRECTION</div>
+        <p class="tool-desc">The 3-qubit bit-flip code. Encode a qubit, inject an error on any of the three physical qubits, run the syndrome measurement, correct — and the logical qubit is perfectly recovered every time.</p>
+      </div>
+      <div class="tool-tags"><span class="tool-tag">Bit-flip code</span><span class="tool-tag">Error injection</span><span class="tool-tag">Syndrome detection</span></div>
+      <div class="tool-footer"><span class="tool-status status-new">★ New</span><span class="tool-arrow">→</span></div>
+    </a>
+
+  </div>
+
+  <div class="learn-section">
+    <div class="section-label">Learn — Concept Guides</div>
+    <div class="learn-grid">
+      <a href="/learn/what-is-a-qubit.html" class="learn-item">
+        <div class="learn-item-label">Fundamentals</div>
+        <div class="learn-item-title">What Is a Qubit?</div>
+      </a>
+      <a href="/learn/hadamard-gate.html" class="learn-item">
+        <div class="learn-item-label">Gates</div>
+        <div class="learn-item-title">The Hadamard Gate Explained</div>
+      </a>
+      <a href="/learn/quantum-superposition.html" class="learn-item">
+        <div class="learn-item-label">Fundamentals</div>
+        <div class="learn-item-title">Quantum Superposition</div>
+      </a>
+      <a href="/learn/quantum-entanglement.html" class="learn-item">
+        <div class="learn-item-label">Fundamentals</div>
+        <div class="learn-item-title">Quantum Entanglement</div>
+      </a>
+      <a href="/learn/bell-states.html" class="learn-item">
+        <div class="learn-item-label">Circuits</div>
+        <div class="learn-item-title">The Four Bell States</div>
+      </a>
+      <a href="/learn/bb84-protocol.html" class="learn-item">
+        <div class="learn-item-label">Cryptography</div>
+        <div class="learn-item-title">BB84 Protocol Explained</div>
+      </a>
+      <a href="/quantum-gates.html" class="learn-item">
+        <div class="learn-item-label">Reference</div>
+        <div class="learn-item-title">Complete Gate Reference</div>
+      </a>
+    </div>
+  </div>
+</div>
+<footer>
+  <a href="/index.html" class="footer-logo">HADAMARD<span>.app</span></a>
+  <div class="footer-copy">© 2026 hadamard.app · Free quantum computing tools · No sign-up required</div>
+  <div class="footer-links"><a href="/quantum-circuit.html">Circuit Sim</a><a href="/quantum-bloch.html">Bloch Sphere</a><a href="/quantum-qkd.html">BB84</a></div>
+</footer>
+</body>
+</html>

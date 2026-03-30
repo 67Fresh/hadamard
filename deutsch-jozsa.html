@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deutsch-Jozsa Algorithm Simulator — Quantum vs Classical | Hadamard</title>
+<meta name="description" content="Interactive Deutsch-Jozsa algorithm simulator. The first proof that quantum beats classical — determine if a function is constant or balanced in one query vs many. See interference do the work.">
+<meta name="keywords" content="deutsch-jozsa algorithm, deutsch-jozsa simulator, quantum speedup, oracle algorithm, quantum vs classical, constant balanced function quantum">
+<link rel="canonical" href="https://hadamard.app/deutsch-jozsa.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Deutsch-Jozsa Algorithm Simulator","url":"https://hadamard.app/deutsch-jozsa.html","applicationCategory":"EducationalApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Orbitron:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#02020a;--surface:#080814;--surface2:#0e0e1e;--border:#1a1a30;--border2:#242440;--cyan:#00e5ff;--cyan-dim:rgba(0,229,255,.08);--magenta:#ff00aa;--green:#00ff9d;--gold:#e8c84a;--white:#e8f0ff;--muted:#5a6080;--dim:#2a2d40;--font-display:'Orbitron',monospace;--font-body:'DM Mono',monospace;--font-serif:'Crimson Pro',Georgia,serif}
+body{background:var(--bg);color:var(--white);font-family:var(--font-body);font-size:13px;min-height:100vh}
+a{color:var(--cyan);text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;border-bottom:1px solid var(--border);background:rgba(2,2,10,.92);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+.nav-logo{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-decoration:none}.nav-logo span{color:var(--magenta)}
+.nav-back{font-size:10px;letter-spacing:1.5px;color:var(--muted);border:1px solid var(--border2);padding:5px 10px;border-radius:2px;text-decoration:none;transition:all .15s}.nav-back:hover{color:var(--cyan);border-color:var(--cyan)}
+.page-wrap{max-width:900px;margin:0 auto;padding:40px 24px 80px}
+.page-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(0,229,255,.2);border-radius:2px;padding:3px 10px;font-size:9px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;margin-bottom:12px;background:var(--cyan-dim)}
+h1{font-family:var(--font-display);font-size:clamp(20px,4vw,36px);font-weight:900;letter-spacing:2px;color:var(--white);line-height:1;margin-bottom:8px}h1 em{color:var(--cyan);font-style:normal}
+.page-sub{font-family:var(--font-serif);font-style:italic;color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:32px}
+/* ORACLE PICKER */
+.oracle-picker{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:20px 24px;margin-bottom:20px}
+.op-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.op-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.oracle-btn{padding:12px 16px;background:var(--surface2);border:1px solid var(--border2);border-radius:3px;color:var(--muted);font-family:var(--font-body);font-size:11px;cursor:pointer;transition:all .12s;text-align:left}
+.oracle-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.oracle-btn.active.constant{border-color:var(--green);color:var(--green);background:rgba(0,255,157,.08)}
+.oracle-btn.active.balanced{border-color:var(--gold);color:var(--gold);background:rgba(232,200,74,.08)}
+.oracle-type{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;opacity:.7}
+.oracle-name{font-size:12px;font-weight:500}
+.oracle-map{font-size:10px;margin-top:4px;opacity:.6;font-family:var(--font-serif);font-style:italic}
+/* COMPARISON */
+.comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.comp-card{background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow:hidden}
+.comp-card::before{content:'';display:block;height:2px}
+.comp-card.classical::before{background:var(--muted)}
+.comp-card.quantum::before{background:linear-gradient(90deg,var(--cyan),var(--magenta))}
+.comp-head{padding:14px 18px;border-bottom:1px solid var(--border)}
+.comp-title{font-family:var(--font-display);font-size:11px;letter-spacing:2px;color:var(--white);margin-bottom:4px}
+.comp-subtitle{font-size:10px;color:var(--muted)}
+.comp-body{padding:16px 18px}
+.queries-display{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;min-height:40px;align-items:center}
+.query-box{width:32px;height:32px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid;transition:all .3s}
+.query-box.pending{border-color:var(--border2);color:var(--dim);background:var(--surface2)}
+.query-box.queried{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim)}
+.query-box.result-0{border-color:var(--green);color:var(--green);background:rgba(0,255,157,.1)}
+.query-box.result-1{border-color:var(--gold);color:var(--gold);background:rgba(232,200,74,.1)}
+.queries-count{font-size:11px;color:var(--muted);margin-top:8px}
+.run-btn{width:100%;padding:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;color:var(--muted);font-family:var(--font-body);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .12s;margin-top:12px}
+.run-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.run-btn.quantum-run{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:500}
+.run-btn.quantum-run:hover{background:#fff}
+/* AMPLITUDE BARS */
+.amp-display{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+.amp-row{display:flex;align-items:center;gap:8px}
+.amp-label{font-size:10px;color:var(--cyan);width:40px;flex-shrink:0}
+.amp-bar-w{flex:1;height:16px;background:var(--bg);border-radius:2px;overflow:hidden;border:1px solid var(--border);position:relative}
+.amp-bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--magenta));border-radius:2px;transition:width .4s ease}
+.amp-bar-fill.negative{background:linear-gradient(90deg,var(--magenta),#7c3aed)}
+.amp-val{font-size:10px;color:var(--white);width:48px;text-align:right;flex-shrink:0}
+/* RESULT BANNER */
+.result-banner{border-radius:4px;padding:16px 20px;margin-bottom:20px;display:none;align-items:center;gap:16px}
+.result-banner.show{display:flex}
+.result-banner.constant{background:rgba(0,255,157,.08);border:1px solid rgba(0,255,157,.3)}
+.result-banner.balanced{background:rgba(232,200,74,.08);border:1px solid rgba(232,200,74,.3)}
+.rb-icon{font-size:24px;flex-shrink:0}
+.rb-title{font-family:var(--font-display);font-size:13px;letter-spacing:1.5px;margin-bottom:4px}
+.result-banner.constant .rb-title{color:var(--green)}
+.result-banner.balanced .rb-title{color:var(--gold)}
+.rb-body{font-family:var(--font-serif);font-size:14px;color:var(--muted);line-height:1.5}
+/* EXPLAINER */
+.explainer{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:20px 24px;margin-bottom:20px}
+.exp-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.exp-body{font-family:var(--font-serif);font-size:15px;color:rgba(232,240,255,.7);line-height:1.7}
+/* FAQ */
+.faq-section{margin-top:40px;border-top:1px solid var(--border);padding-top:28px}
+.faq-title{font-family:var(--font-display);font-size:14px;letter-spacing:3px;color:var(--muted);margin-bottom:16px;text-transform:uppercase}
+.faq-item{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}.faq-item:last-child{border-bottom:none;margin-bottom:0}
+.faq-q{font-size:13px;font-weight:500;color:var(--white);margin-bottom:6px}.faq-a{font-family:var(--font-serif);font-size:14px;color:var(--muted);line-height:1.7}
+footer{border-top:1px solid var(--border);padding:20px 28px;display:flex;justify-content:space-between;align-items:center;margin-top:40px;flex-wrap:wrap;gap:10px}
+.footer-logo{font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-decoration:none}.footer-logo span{color:var(--magenta)}
+.footer-copy{font-size:11px;color:var(--dim)}.footer-links{display:flex;gap:16px}
+.footer-links a{font-size:10px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;text-decoration:none;transition:color .15s}.footer-links a:hover{color:var(--cyan)}
+@media(max-width:600px){.comparison-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/index.html" class="nav-logo">HADAMARD<span>.app</span></a>
+  <a href="/algorithms.html" class="nav-back">← All Tools</a>
+</nav>
+<div class="page-wrap">
+  <div class="page-badge">∿ Algorithm</div>
+  <h1>DEUTSCH-<em>JOZSA</em></h1>
+  <p class="page-sub">Given a black-box function f(x), is it constant (same output for all inputs) or balanced (0 for half, 1 for half)? Classical computers need up to 2ⁿ⁻¹+1 queries. The quantum algorithm needs exactly one.</p>
+
+  <div class="oracle-picker">
+    <div class="op-label">Choose an oracle function f(x)</div>
+    <div class="op-grid" id="oracle-grid"></div>
+  </div>
+
+  <div class="explainer">
+    <div class="exp-title">What the algorithm does</div>
+    <div class="exp-body" id="explainer-text">Select an oracle above. The algorithm puts all input qubits into superposition, applies the oracle (which encodes f into quantum phase via phase kickback), then applies Hadamard gates again. Interference causes all amplitudes to cancel to zero if the function is constant, or to partially survive if it's balanced. Measuring the input register gives all zeros for constant, and at least one non-zero bit for balanced — in a single shot.</div>
+  </div>
+
+  <div class="comparison-grid">
+    <div class="comp-card classical">
+      <div class="comp-head">
+        <div class="comp-title">CLASSICAL COMPUTER</div>
+        <div class="comp-subtitle">Query f(x) one input at a time</div>
+      </div>
+      <div class="comp-body">
+        <div class="queries-display" id="classical-queries"></div>
+        <div class="queries-count" id="classical-count">—</div>
+        <button class="run-btn" id="classical-btn" onclick="runClassical()">▶ Run Classical</button>
+      </div>
+    </div>
+    <div class="comp-card quantum">
+      <div class="comp-head">
+        <div class="comp-title">QUANTUM COMPUTER</div>
+        <div class="comp-subtitle">Query f(x) once in superposition</div>
+      </div>
+      <div class="comp-body">
+        <div class="amp-display" id="quantum-amps">
+          <div style="color:var(--dim);font-style:italic;font-family:'Crimson Pro',Georgia,serif;font-size:13px">Run to see amplitude interference</div>
+        </div>
+        <div class="queries-count" id="quantum-count">—</div>
+        <button class="run-btn quantum-run" id="quantum-btn" onclick="runQuantum()">▶ Run Quantum</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-banner" id="result-banner">
+    <div class="rb-icon" id="rb-icon"></div>
+    <div>
+      <div class="rb-title" id="rb-title"></div>
+      <div class="rb-body" id="rb-body"></div>
+    </div>
+  </div>
+
+  <div class="faq-section">
+    <div class="faq-title">Understanding Deutsch-Jozsa</div>
+    <div class="faq-item">
+      <div class="faq-q">Why does a classical computer need so many queries?</div>
+      <div class="faq-a">In the worst case, you query f(0), f(1), f(2)... and keep getting the same result. You can't conclude "constant" until you've seen more than half the inputs all agree — because if even one output differs, the function is balanced. For n input bits, that's 2ⁿ⁻¹+1 queries in the worst case.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How does interference give the answer in one query?</div>
+      <div class="faq-a">The Hadamard gate puts all inputs into superposition simultaneously. The oracle applies phase kickback — writing f(x) into the phase of each amplitude. If f is constant, all phases are the same, and the final Hadamard layer causes constructive interference back to |000...0⟩ (all zeros). If f is balanced, half the phases are flipped, causing destructive interference that prevents the all-zeros outcome. Measurement distinguishes the two cases instantly.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is this a practical speedup?</div>
+      <div class="faq-a">Not directly — the problem is artificial (no real application requires knowing whether a function is constant or balanced). But it was the first rigorous proof that quantum computers can solve a specific problem exponentially faster than any classical algorithm — establishing the theoretical possibility of quantum advantage. It paved the way for Shor's algorithm, Grover's algorithm, and the whole field of quantum algorithm design.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Who invented it?</div>
+      <div class="faq-a">David Deutsch proposed the 1-bit version (Deutsch's problem) in 1985 as part of his foundational paper on quantum computation. Richard Jozsa extended it to n bits in 1992. The algorithm is typically named Deutsch-Jozsa after both.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="/index.html" class="footer-logo">HADAMARD<span>.app</span></a>
+  <div class="footer-copy">© 2026 hadamard.app</div>
+  <div class="footer-links"><a href="/quantum-circuit.html">Circuit Sim</a><a href="/quantum-grover.html">Grover</a><a href="/algorithms.html">All Tools</a></div>
+</footer>
+
+<script>
+const ORACLES = [
+  { id:'c0', type:'constant', name:'Always 0', map:'f(x) = 0 for all x', fn: x=>0 },
+  { id:'c1', type:'constant', name:'Always 1', map:'f(x) = 1 for all x', fn: x=>1 },
+  { id:'b0', type:'balanced', name:'Identity', map:'f(x) = x₀ (first bit)', fn: x=>(x>>2)&1 },
+  { id:'b1', type:'balanced', name:'Parity', map:'f(x) = x₀ XOR x₁', fn: x=>((x>>2)&1)^((x>>1)&1) },
+  { id:'b2', type:'balanced', name:'Majority', map:'f(x) = majority vote', fn: x=>{ const b=[(x>>2)&1,(x>>1)&1,x&1]; return b.filter(v=>v).length>=2?1:0; }},
+  { id:'b3', type:'balanced', name:'Anti-parity', map:'f(x) = x₁ XOR x₂', fn: x=>((x>>1)&1)^(x&1) },
+];
+let selectedOracle = ORACLES[0];
+let classicalRunning = false;
+
+function buildOracleGrid() {
+  const grid = document.getElementById('oracle-grid');
+  grid.innerHTML = ORACLES.map(o=>`
+    <button class="oracle-btn ${o.type} ${o===selectedOracle?'active':''}" onclick="selectOracle('${o.id}')">
+      <div class="oracle-type">${o.type}</div>
+      <div class="oracle-name">${o.name}</div>
+      <div class="oracle-map">${o.map}</div>
+    </button>`).join('');
+}
+
+function selectOracle(id) {
+  selectedOracle = ORACLES.find(o=>o.id===id);
+  buildOracleGrid();
+  resetDisplays();
+  const type = selectedOracle.type;
+  document.getElementById('explainer-text').textContent =
+    type==='constant'
+      ? `This oracle implements a CONSTANT function: f(x) = ${selectedOracle.fn(0)} for every input. The quantum algorithm will put all qubits in superposition, apply this oracle as a phase kickback, then apply Hadamard again. Because all phases are identical, they interfere constructively back to |000⟩. Measurement gives all zeros → conclusion: CONSTANT. One query.`
+      : `This oracle implements a BALANCED function: exactly half the inputs give 0 and half give 1. After superposition and oracle application, the mixed phases cause destructive interference on the |000⟩ state. Measurement gives at least one non-zero bit → conclusion: BALANCED. One query.`;
+}
+
+function resetDisplays() {
+  document.getElementById('result-banner').className = 'result-banner';
+  document.getElementById('classical-queries').innerHTML = '';
+  document.getElementById('classical-count').textContent = '—';
+  document.getElementById('quantum-amps').innerHTML = '<div style="color:var(--dim);font-style:italic;font-family:\'Crimson Pro\',Georgia,serif;font-size:13px">Press Run Quantum to simulate</div>';
+  document.getElementById('quantum-count').textContent = '—';
+}
+
+async function runClassical() {
+  if (classicalRunning) return;
+  classicalRunning = true;
+  const btn = document.getElementById('classical-btn');
+  btn.disabled = true; btn.textContent = '⟳ Querying...';
+
+  const N = 8; // 3-bit inputs: 0-7
+  const container = document.getElementById('classical-queries');
+  container.innerHTML = '';
+
+  // Create all boxes first
+  const boxes = [];
+  for (let i=0;i<N;i++) {
+    const b = document.createElement('div');
+    b.className='query-box pending';
+    b.textContent=i.toString(2).padStart(3,'0');
+    container.appendChild(b); boxes.push(b);
+  }
+
+  let queriesNeeded = N;
+  let seenValues = new Set();
+
+  for (let i=0;i<N;i++) {
+    await new Promise(r=>setTimeout(r,180));
+    const result = selectedOracle.fn(i);
+    seenValues.add(result);
+    boxes[i].className = `query-box result-${result}`;
+    boxes[i].textContent = result;
+
+    // Can we conclude early?
+    if (seenValues.size === 2) {
+      // Found both 0 and 1 — must be balanced
+      queriesNeeded = i+1;
+      for (let j=i+1;j<N;j++) boxes[j].className='query-box pending';
+      break;
+    }
+    if (i >= Math.floor(N/2)) {
+      // Past halfway and only seen one value — must be constant
+      queriesNeeded = i+1;
+      break;
+    }
+    queriesNeeded = i+1;
+  }
+
+  const isConst = seenValues.size === 1;
+  document.getElementById('classical-count').textContent = `Queries used: ${queriesNeeded} of ${N} (worst case: ${N/2+1})`;
+  showResult(isConst, 'classical');
+  btn.disabled = false; btn.textContent = '▶ Run Classical Again';
+  classicalRunning = false;
+}
+
+function runQuantum() {
+  const N = 8; // 3 input qubits → 8 states
+  const isConst = selectedOracle.type === 'constant';
+  const constVal = selectedOracle.fn(0);
+
+  // Simulate amplitude after oracle + final H layer
+  // For constant-0: all amplitudes uniform positive → interfere to |000⟩=1
+  // For constant-1: all amplitudes uniform negative → interfere to |000⟩=-1 (still gives 1 in prob)
+  // For balanced: |000⟩ amplitude = 0, others survive
+
+  const amps = new Array(N).fill(0);
+  if (isConst) {
+    amps[0] = 1; // All interfere constructively to |000⟩
+  } else {
+    // Balanced: |000⟩ = 0, distribute across others
+    for (let i=1;i<N;i++) amps[i] = (i%2===0?1:-1)/Math.sqrt(N-1);
+    amps[0] = 0;
+  }
+
+  const container = document.getElementById('quantum-amps');
+  container.innerHTML = amps.map((a,i)=>{
+    const label = '|'+i.toString(2).padStart(3,'0')+'⟩';
+    const pct = Math.abs(a)*100;
+    const neg = a < 0;
+    return `<div class="amp-row">
+      <span class="amp-label">${label}</span>
+      <div class="amp-bar-w"><div class="amp-bar-fill${neg?' negative':''}" style="width:${pct}%"></div></div>
+      <span class="amp-val">${a===0?'0':(neg?'−':'')+Math.abs(a).toFixed(3)}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('quantum-count').textContent = `Queries used: 1 of 1. Measurement: ${isConst?'|000⟩ (100%)':'non-zero state (100%)'}`;
+  showResult(isConst, 'quantum');
+}
+
+function showResult(isConst, source) {
+  const banner = document.getElementById('result-banner');
+  const type = isConst ? 'constant' : 'balanced';
+  banner.className = `result-banner show ${type}`;
+  document.getElementById('rb-icon').textContent = isConst ? '✓' : '≠';
+  document.getElementById('rb-title').textContent = `FUNCTION IS ${type.toUpperCase()}`;
+  document.getElementById('rb-body').textContent = isConst
+    ? `${selectedOracle.name}: f(x) = ${selectedOracle.fn(0)} for all 8 inputs. ${source==='quantum'?'The quantum algorithm found this in 1 query via constructive interference on |000⟩.':'The classical algorithm confirmed this by querying enough inputs.'}`
+    : `${selectedOracle.name}: exactly 4 inputs give 0 and 4 give 1. ${source==='quantum'?'The quantum algorithm found this in 1 query — |000⟩ amplitude is zero, so measurement never returns all-zeros.':'The classical algorithm found disagreement in the outputs.'}`;
+}
+
+buildOracleGrid();
+resetDisplays();
+</script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Is a Qubit? The Quantum Bit Explained Simply | Hadamard</title>
+<meta name="description" content="A qubit is the basic unit of quantum information — but it behaves nothing like a classical bit. Learn what qubits are, how superposition works, and why they give quantum computers their power.">
+<meta name="keywords" content="what is a qubit, qubit explained, quantum bit, qubit vs bit, quantum superposition, quantum computing basics">
+<link rel="canonical" href="https://hadamard.app/learn/what-is-a-qubit.html">
+<meta property="og:title" content="What Is a Qubit? | Hadamard">
+<meta property="og:description" content="A qubit is the basic unit of quantum information. Learn what makes it different from a classical bit — and why that difference matters.">
+<meta property="og:url" content="https://hadamard.app/learn/what-is-a-qubit.html">
+<meta property="og:type" content="article">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"What Is a Qubit?","description":"A clear explanation of qubits, superposition, and quantum computing basics","url":"https://hadamard.app/learn/what-is-a-qubit.html","publisher":{"@type":"Organization","name":"Hadamard","url":"https://hadamard.app"}}</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Orbitron:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#02020a;--surface:#080814;--surface2:#0e0e1e;--border:#1a1a30;--border2:#242440;--cyan:#00e5ff;--cyan-dim:rgba(0,229,255,.08);--magenta:#ff00aa;--green:#00ff9d;--white:#e8f0ff;--muted:#5a6080;--dim:#2a2d40;--font-display:'Orbitron',monospace;--font-body:'DM Mono',monospace;--font-serif:'Crimson Pro',Georgia,serif}
+body{background:var(--bg);color:var(--white);font-family:var(--font-serif);font-size:17px;line-height:1.75}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;border-bottom:1px solid var(--border);background:rgba(2,2,10,.95);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+.nav-logo{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-shadow:0 0 16px rgba(0,229,255,.4);text-decoration:none}
+.nav-logo span{color:var(--magenta)}
+.nav-links{display:flex;gap:24px}
+.nav-links a{font-family:var(--font-body);font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--cyan)}
+.nav-back{font-size:10px;letter-spacing:1.5px;color:var(--muted);border:1px solid var(--border2);padding:5px 10px;border-radius:2px;transition:all .15s;font-family:var(--font-body);text-decoration:none}
+.nav-back:hover{color:var(--cyan);border-color:var(--cyan)}
+.page-wrap{max-width:740px;margin:0 auto;padding:60px 24px 80px}
+.breadcrumb{font-family:var(--font-body);font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:24px}
+.breadcrumb a{color:var(--muted);text-decoration:none}
+.breadcrumb a:hover{color:var(--cyan)}
+.breadcrumb span{margin:0 8px;opacity:.4}
+.page-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(0,229,255,.2);border-radius:2px;padding:3px 10px;font-size:9px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;margin-bottom:16px;background:var(--cyan-dim);font-family:var(--font-body)}
+h1{font-family:var(--font-display);font-size:clamp(22px,4vw,38px);font-weight:900;letter-spacing:1px;color:var(--white);line-height:1.1;margin-bottom:12px}
+h1 em{color:var(--cyan);font-style:normal}
+.page-sub{font-family:var(--font-serif);font-style:italic;color:var(--muted);font-size:16px;line-height:1.6;margin-bottom:40px;border-bottom:1px solid var(--border);padding-bottom:24px}
+h2{font-family:var(--font-display);font-size:16px;font-weight:700;letter-spacing:2px;color:var(--cyan);margin:40px 0 16px;text-transform:uppercase}
+h3{font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:1.5px;color:var(--white);margin:28px 0 12px}
+p{margin-bottom:20px;color:rgba(232,240,255,.8)}
+strong{color:var(--white);font-weight:400}
+.callout{background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--cyan);border-radius:2px;padding:16px 20px;margin:24px 0;font-family:var(--font-serif);font-size:16px;color:rgba(232,240,255,.75);line-height:1.7}
+.callout.green{border-left-color:var(--green)}
+.callout.magenta{border-left-color:var(--magenta)}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin:24px 0}
+.comp-cell{background:var(--surface);padding:20px 24px}
+.comp-label{font-family:var(--font-body);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.comp-label.classical{color:var(--muted)}
+.comp-label.quantum{color:var(--cyan)}
+.comp-cell p{font-size:14px;margin-bottom:8px;color:rgba(232,240,255,.7)}
+.comp-cell p:last-child{margin-bottom:0}
+.math{font-family:var(--font-body);font-size:14px;background:var(--surface2);border:1px solid var(--border2);border-radius:2px;padding:12px 18px;margin:16px 0;color:var(--cyan);text-align:center;letter-spacing:.5px}
+.tool-cta{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:20px 24px;margin:40px 0;gap:16px;flex-wrap:wrap}
+.tool-cta-text strong{display:block;font-family:var(--font-body);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--white);margin-bottom:6px}
+.tool-cta-text span{font-size:14px;color:var(--muted)}
+.btn-tool{font-family:var(--font-body);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#000;background:var(--cyan);padding:10px 20px;border-radius:2px;text-decoration:none;white-space:nowrap;transition:opacity .15s}
+.btn-tool:hover{opacity:.85;text-decoration:none}
+.faq-section{margin-top:48px;border-top:1px solid var(--border);padding-top:32px}
+.faq-title{font-family:var(--font-display);font-size:14px;letter-spacing:3px;color:var(--muted);margin-bottom:20px;text-transform:uppercase}
+.faq-item{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.faq-item:last-child{border-bottom:none;margin-bottom:0}
+.faq-q{font-family:var(--font-body);font-size:13px;font-weight:500;color:var(--white);margin-bottom:8px}
+.faq-a{font-size:15px;color:var(--muted);line-height:1.7}
+.learn-nav{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:40px;border-top:1px solid var(--border);padding-top:32px}
+.learn-card{background:var(--surface);border:1px solid var(--border2);border-radius:3px;padding:16px 18px;text-decoration:none;transition:border-color .15s}
+.learn-card:hover{border-color:var(--cyan);text-decoration:none}
+.learn-card-label{font-family:var(--font-body);font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.learn-card-title{font-family:var(--font-body);font-size:12px;color:var(--white)}
+footer{border-top:1px solid var(--border);padding:20px 28px;display:flex;justify-content:space-between;align-items:center;margin-top:60px;flex-wrap:wrap;gap:10px}
+.footer-logo{font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-decoration:none}
+.footer-logo span{color:var(--magenta)}
+.footer-copy{font-size:11px;color:var(--dim);font-family:var(--font-body)}
+.footer-links{display:flex;gap:16px}
+.footer-links a{font-size:10px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;text-decoration:none;font-family:var(--font-body);transition:color .15s}
+.footer-links a:hover{color:var(--cyan)}
+@media(max-width:600px){.comparison{grid-template-columns:1fr}.learn-nav{grid-template-columns:1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/index.html" class="nav-logo">HADAMARD<span>.app</span></a>
+  <div class="nav-links">
+    <a href="/algorithms.html">Tools</a>
+    <a href="/quantum-gates.html">Gates</a>
+    <a href="/learn/what-is-a-qubit.html">Learn</a>
+  </div>
+  <a href="/index.html" class="nav-back">← All Tools</a>
+</nav>
+
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="/index.html">Home</a><span>›</span>
+    <a href="/learn/what-is-a-qubit.html">Learn</a><span>›</span>
+    What Is a Qubit
+  </div>
+
+  <div class="page-badge">📖 Learn · Fundamentals</div>
+  <h1>What Is a <em>Qubit?</em></h1>
+  <p class="page-sub">The quantum bit — the basic unit of quantum information — behaves in ways that have no classical equivalent. Here's what it actually is, and why it matters.</p>
+
+  <h2>The Classical Bit</h2>
+  <p>Every computer you've ever used — your phone, your laptop, the servers running the internet — stores and processes information as <strong>bits</strong>. A bit has exactly two possible values: 0 or 1. On or off. True or false. At any given moment, every bit in a classical computer is definitively one or the other.</p>
+  <p>This is intuitive because it matches how the physical world feels at the scale we live in. A light switch is either up or down. A coin on the table is either heads or tails. Classical bits are like that: definite, readable, ordinary.</p>
+
+  <h2>The Quantum Bit</h2>
+  <p>A <strong>qubit</strong> is the quantum equivalent of a bit. Like a classical bit, when you measure a qubit you get either 0 or 1. But before measurement, a qubit can exist in a <strong>superposition</strong> of both states simultaneously.</p>
+  <p>This isn't a metaphor or a simplification — it's a precise mathematical statement. The state of a qubit is described by a quantum state vector with two complex-number components, one for |0⟩ and one for |1⟩:</p>
+  <div class="math">|ψ⟩ = α|0⟩ + β|1⟩</div>
+  <p>Here α and β are complex numbers called <strong>amplitudes</strong>. Their squared magnitudes give the probability of each outcome when the qubit is measured: the probability of getting 0 is |α|², and the probability of getting 1 is |β|². They must sum to 1: |α|² + |β|² = 1.</p>
+
+  <div class="callout">
+    The coin analogy is helpful but misleading. A spinning coin isn't really in superposition — it's just moving too fast to see. A qubit in superposition genuinely has no definite value. The uncertainty is fundamental, not a matter of incomplete information.
+  </div>
+
+  <h2>Qubit vs. Classical Bit</h2>
+  <div class="comparison">
+    <div class="comp-cell">
+      <div class="comp-label classical">Classical Bit</div>
+      <p>Always either 0 or 1</p>
+      <p>Reading the value doesn't change it</p>
+      <p>Can be copied perfectly</p>
+      <p>n bits: describes one of 2ⁿ states</p>
+    </div>
+    <div class="comp-cell">
+      <div class="comp-label quantum">Qubit</div>
+      <p>Can be 0, 1, or any superposition</p>
+      <p>Measurement collapses superposition — changes the state</p>
+      <p>Cannot be copied (No-Cloning Theorem)</p>
+      <p>n qubits: can be in superposition of all 2ⁿ states at once</p>
+    </div>
+  </div>
+
+  <h2>Why Does Superposition Matter?</h2>
+  <p>The power isn't that a qubit stores more information — when you measure it, you still get a single classical bit. The power is what happens <em>before</em> measurement.</p>
+  <p>With <strong>n qubits</strong> in superposition, the quantum system simultaneously represents all 2ⁿ possible combinations. A 3-qubit system is in superposition of |000⟩, |001⟩, |010⟩, |011⟩, |100⟩, |101⟩, |110⟩, and |111⟩ simultaneously. A quantum algorithm can apply operations to all these states at once.</p>
+  <p>With 300 qubits in superposition, you have more simultaneous states than there are atoms in the observable universe. This is why certain problems that would take classical computers millions of years become tractable on a quantum computer.</p>
+
+  <h2>Entanglement: Qubits That Aren't Independent</h2>
+  <p>When two qubits interact through a quantum gate, they can become <strong>entangled</strong>. Entangled qubits don't have independent states — you can't describe one without the other. Measuring one qubit instantly determines the state of the other, regardless of distance.</p>
+  <p>The most famous entangled state is the <strong>Bell state</strong>: (|00⟩ + |11⟩)/√2. If you measure this system, you'll get either "both 0" or "both 1" — never "0 and 1." The correlation is perfect and unavoidable. This is entanglement, and it's one of the core resources quantum computers use to outperform classical ones.</p>
+
+  <h2>Physical Implementations</h2>
+  <p>Qubits aren't an abstraction — they're real physical systems. Several physical platforms can implement a qubit, each with different trade-offs:</p>
+  <p><strong>Superconducting qubits</strong> (used by IBM and Google) are tiny circuits cooled to near absolute zero. They're fast and integrate well with existing fabrication technology, but require massive cooling infrastructure.</p>
+  <p><strong>Trapped ions</strong> (used by IonQ and Quantinuum) use individual atoms suspended in electromagnetic fields. They have very long coherence times but are slower to operate.</p>
+  <p><strong>Photons</strong> use individual particles of light. They naturally don't decohere, but creating interactions between photons is hard.</p>
+  <p>All of these behave according to the same mathematics. The qubit abstraction — the |ψ⟩ = α|0⟩ + β|1⟩ formalism — applies to all of them.</p>
+
+  <h2>Decoherence: The Main Challenge</h2>
+  <p>The fragility of quantum states is the central engineering challenge of quantum computing. Any interaction with the environment — heat, vibration, stray electromagnetic fields — destroys superposition in a process called <strong>decoherence</strong>. Once a qubit decoheres, it behaves classically and the quantum computation is ruined.</p>
+  <p>This is why quantum computers operate at temperatures near absolute zero, in carefully shielded enclosures, and why quantum error correction is an active research area. The race in quantum hardware is largely a race to maintain coherence long enough to complete useful computations.</p>
+
+  <div class="tool-cta">
+    <div class="tool-cta-text">
+      <strong>Try it interactively</strong>
+      <span>Place a Hadamard gate on a qubit in the circuit simulator and press Run. You'll see superposition in action — 50% |0⟩, 50% |1⟩.</span>
+    </div>
+    <a href="/quantum-circuit.html" class="btn-tool">Open Circuit Simulator →</a>
+  </div>
+
+  <div class="faq-section">
+    <div class="faq-title">Common Questions</div>
+    <div class="faq-item">
+      <div class="faq-q">Does a qubit store more information than a classical bit?</div>
+      <div class="faq-a">Not in the sense you might think. When you measure a qubit you get one classical bit of information — 0 or 1. The amplitudes α and β are real, but they aren't directly readable. What qubits provide is the ability to process information in superposition, which enables certain algorithms to run exponentially faster than any classical equivalent.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Why can't you just check what state a qubit is in without measuring it?</div>
+      <div class="faq-a">Measurement in quantum mechanics is not passive — it actively collapses the superposition. There's no way to determine the full quantum state of an unknown qubit without disturbing it. This is the content of the No-Cloning Theorem and is one of the features that makes quantum cryptography secure.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How many qubits do you need for a useful quantum computer?</div>
+      <div class="faq-a">It depends entirely on the problem and the quality of the qubits. For Shor's algorithm to factor a 2048-bit RSA key, you'd need several thousand logical qubits — which might require millions of physical qubits for error correction. Today's machines have hundreds to thousands of physical qubits but are still considered "noisy intermediate-scale quantum" (NISQ) devices. The threshold for genuine quantum advantage on practical problems is still being established.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is quantum computing just faster computing?</div>
+      <div class="faq-a">No — that's an important misconception. Quantum computers aren't faster for all tasks. They're qualitatively better for a specific class of problems — particularly those involving searching unstructured databases, factoring large numbers, simulating quantum systems, and certain optimization problems. For most everyday computing tasks, a classical computer is perfectly adequate and often faster.</div>
+    </div>
+  </div>
+
+  <div class="learn-nav">
+    <a href="/learn/quantum-superposition.html" class="learn-card">
+      <div class="learn-card-label">Next →</div>
+      <div class="learn-card-title">Quantum Superposition Explained</div>
+    </a>
+    <a href="/learn/hadamard-gate.html" class="learn-card">
+      <div class="learn-card-label">Related</div>
+      <div class="learn-card-title">The Hadamard Gate: Gateway to Superposition</div>
+    </a>
+  </div>
+</div>
+
+<footer>
+  <a href="/index.html" class="footer-logo">HADAMARD<span>.app</span></a>
+  <div class="footer-copy">© 2026 hadamard.app · Free quantum computing tools</div>
+  <div class="footer-links">
+    <a href="/quantum-circuit.html">Circuit Sim</a>
+    <a href="/quantum-bloch.html">Bloch Sphere</a>
+    <a href="/quantum-qkd.html">BB84</a>
+    <a href="/quantum-grover.html">Grover</a>
+  </div>
+</footer>
+</body>
+</html>

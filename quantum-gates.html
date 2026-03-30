@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Logic Gates — Complete Reference with Matrices | Hadamard</title>
+<meta name="description" content="Complete reference for quantum computing gates: Hadamard, Pauli X/Y/Z, S, T, CNOT, Toffoli, SWAP, and more. Each gate includes its matrix, Bloch sphere effect, and circuit diagram.">
+<meta name="keywords" content="quantum logic gates, quantum gates reference, hadamard gate matrix, pauli gates, CNOT gate, quantum gate matrices, qubit gates explained">
+<link rel="canonical" href="https://hadamard.app/quantum-gates.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Quantum Logic Gates Reference","url":"https://hadamard.app/quantum-gates.html","publisher":{"@type":"Organization","name":"Hadamard","url":"https://hadamard.app"}}</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Orbitron:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#02020a;--surface:#080814;--surface2:#0e0e1e;--border:#1a1a30;--border2:#242440;--cyan:#00e5ff;--cyan-dim:rgba(0,229,255,.08);--magenta:#ff00aa;--green:#00ff9d;--white:#e8f0ff;--muted:#5a6080;--dim:#2a2d40;--font-display:'Orbitron',monospace;--font-body:'DM Mono',monospace;--font-serif:'Crimson Pro',Georgia,serif}
+body{background:var(--bg);color:var(--white);font-family:var(--font-body);font-size:13px}
+a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;border-bottom:1px solid var(--border);background:rgba(2,2,10,.95);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+.nav-logo{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-decoration:none}.nav-logo span{color:var(--magenta)}
+.nav-links{display:flex;gap:24px}.nav-links a{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;text-decoration:none;transition:color .15s}.nav-links a:hover{color:var(--cyan)}
+.nav-back{font-size:10px;letter-spacing:1.5px;color:var(--muted);border:1px solid var(--border2);padding:5px 10px;border-radius:2px;text-decoration:none;transition:all .15s}.nav-back:hover{color:var(--cyan);border-color:var(--cyan)}
+.page-wrap{max-width:1000px;margin:0 auto;padding:60px 24px 80px}
+.page-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(0,229,255,.2);border-radius:2px;padding:3px 10px;font-size:9px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;margin-bottom:16px;background:var(--cyan-dim)}
+h1{font-family:var(--font-display);font-size:clamp(22px,4vw,38px);font-weight:900;letter-spacing:2px;color:var(--white);line-height:1.05;margin-bottom:12px}h1 em{color:var(--cyan);font-style:normal}
+.page-sub{font-family:var(--font-serif);font-style:italic;color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:48px;padding-bottom:24px;border-bottom:1px solid var(--border);max-width:600px}
+.section-head{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin:40px 0 20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.gates-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:48px}
+.gate-ref-card{background:var(--surface);border:1px solid var(--border2);border-radius:4px;overflow:hidden}
+.grc-head{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--border)}
+.gate-symbol{width:44px;height:44px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:16px;font-weight:700;border:2px solid;flex-shrink:0}
+.grc-info{flex:1}
+.gate-full-name{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--white);letter-spacing:1px;margin-bottom:3px}
+.gate-class{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.grc-body{padding:16px 18px}
+.grc-desc{font-family:var(--font-serif);font-size:14px;color:rgba(232,240,255,.7);line-height:1.6;margin-bottom:14px}
+.grc-matrix{font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:10px 14px;margin-bottom:12px;color:var(--cyan);line-height:1.8;font-family:var(--font-body)}
+.grc-matrix .ml{color:rgba(0,229,255,.4);font-size:11px}
+.grc-transform{font-size:11px;color:var(--muted);line-height:1.7}
+.grc-transform span{color:var(--green)}
+.grc-actions{padding:12px 18px;border-top:1px solid var(--border);background:rgba(255,255,255,.02);display:flex;justify-content:space-between;align-items:center}
+.grc-use{font-size:10px;color:var(--dim);font-style:italic;font-family:var(--font-serif)}
+.try-btn{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#000;background:var(--cyan);padding:5px 12px;border-radius:2px;text-decoration:none;transition:opacity .15s}.try-btn:hover{opacity:.85;text-decoration:none}
+.identity-note{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:20px 24px;margin-bottom:24px;font-family:var(--font-serif);font-size:15px;color:var(--muted);line-height:1.7}
+.identity-note strong{color:var(--white);font-weight:400}
+footer{border-top:1px solid var(--border);padding:20px 28px;display:flex;justify-content:space-between;align-items:center;margin-top:40px;flex-wrap:wrap;gap:10px}
+.footer-logo{font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:3px;color:var(--cyan);text-decoration:none}.footer-logo span{color:var(--magenta)}
+.footer-copy{font-size:11px;color:var(--dim)}.footer-links{display:flex;gap:16px}
+.footer-links a{font-size:10px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;text-decoration:none;transition:color .15s}.footer-links a:hover{color:var(--cyan)}
+@media(max-width:600px){.gates-grid{grid-template-columns:1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/index.html" class="nav-logo">HADAMARD<span>.app</span></a>
+  <div class="nav-links"><a href="/algorithms.html">Tools</a><a href="/quantum-gates.html">Gates</a><a href="/learn/what-is-a-qubit.html">Learn</a></div>
+  <a href="/index.html" class="nav-back">← All Tools</a>
+</nav>
+<div class="page-wrap">
+  <div class="page-badge">📐 Reference</div>
+  <h1>QUANTUM <em>GATES</em></h1>
+  <p class="page-sub">Every standard quantum gate — matrix, effect, transformations, and use cases. All gates are unitary: applying a gate and then its conjugate transpose returns the original state. Click "Try in Simulator" to place any gate in the circuit.</p>
+
+  <div class="section-head">Single-Qubit Gates</div>
+
+  <div class="identity-note">
+    <strong>Unitarity:</strong> All quantum gates must be unitary matrices — meaning U†U = I (applying a gate then its inverse returns the original state). This preserves the total probability and ensures quantum evolution is reversible. Gates that are their own inverse (like H, X, Y, Z) are called Hermitian and satisfy U² = I.
+  </div>
+
+  <div class="gates-grid">
+
+    <div class="gate-ref-card">
+      <div class="grc-head">
+        <div class="gate-symbol" style="border-color:#00e5ff;color:#00e5ff;background:rgba(0,229,255,.1)">H</div>
+        <div class="grc-info">
+          <div class="gate-full-name">HADAMARD</div>
+          <div class="gate-class">Superposition Gate</div>
+        </div>
+      </div>
+      <div class="grc-body">
+        <div class="grc-desc">Creates equal superposition. The most fundamental gate in quantum computing. Transforms the Z-basis into the X-basis and vice versa.</div>
+        <div class="grc-matrix"><span class="ml">H = (1/√2) ×</span> [1  1 / 1  −1]</div>
+        <div class="grc-transform"><span>|0⟩ → |+⟩ = (|0⟩+|1⟩)/√2</span><br><span>|1⟩ → |−⟩ = (|0⟩−|1⟩)/√2</span><br>H² = Identity · H is self-inverse</div>
+      </div>
+      <div class="grc-actions"><span class="grc-use">Used in: all algorithms, Bell states, QFT</span><a href="/quantum-circuit.html" class="try-btn">Try →</a></div>
+    </div>
+
+    <div class="gate-ref-card">
+      <div class="grc-head">
+        <div class="gate-symbol" style="border-color:#ff6b6b;color:#ff6b6b;background:rgba(255,107,107,.1)">X</div>
+        <div class="grc-info">
+          <div class="gate-full-name">PAULI-X (NOT)</div>
+          <div class="gate-class">Bit Flip Gate</div>
+        </div>
+      </div>
+      <div class="grc-body">
+        <div class="grc-desc">The quantum NOT gate. Flips |0⟩ to |1⟩ and |1⟩ to |0⟩. On the Bloch sphere, it's a 180° rotation around the X axis.</div>
+        <div class="grc-matrix"><span class="ml">X =</span> [0  1 / 1  0]</div>
+        <div class="grc-transform"><span>|0⟩ → |1⟩</span><br><span>|1⟩ → |0⟩</span><br>X² = Identity · HXH = Z</div>
+      </div>
+      <div class="grc-actions"><span class="grc-use">Used in: state initialization, CNOT target, Grover oracle</span><a href="/quantum-circuit.html" class="try-btn">Try →</a></div>
+    </div>
+
+    <div class="gate-ref-card">
+      <div class="grc-head">
+        <div class="gate-symbol" style="border-color:#ffd93d;color:#ffd93d;background:rgba(255,217,61,.1)">Y</div>
+        <div class="grc-info">
+          <div class="gate-full-name">PAULI-Y</div>
+          <div class="gate-class">Rotation Gate</div>
+        </div>
+      </div>
+      <div class="grc-body">
+        <div class="grc-desc">180° rotation around the Y axis of the Bloch sphere. Equivalent to X followed by a phase shift. Combines bit flip and phase flip.</div>
+        <div class="grc-matrix"><span class="ml">Y =</span> [0  −i / i  0]</div>
+        <div class="grc-transform"><span>|0⟩ → i|1⟩</span><br><span>|1⟩ → −i|0⟩</span><br>Y² = Identity · HYH = −Y</div>
+      </div>
+      <div class="grc-actions"><span class="grc-use">Used in: error correction, rotation sequences</span><a href="/quantum-circuit.html" class="try-btn">Try →</a></div>
+    </div>
+
+    <div class="gate-ref-card">
+      <div class="grc-head">
+        <div class="gate-symbol" style="border-color:#6bcb77;color:#6bcb77;background:rgba(107,203,119,.1)">Z</div>
+        <div class="grc-info">
+          <div class="gate-full-name">PAULI-Z</div>
+          <div class="gate-class">Phase Flip Gate</div>
+        </div>
+      </div>
+      <div class="grc-body">
+        <div class="grc-desc">Phase flip. Leaves |0⟩ unchanged, maps |1⟩ to −|1⟩. 180° rotation around the Z axis. Invisible to measurement in the Z-basis but detectable via interference.</div>
+        <div class="grc-matrix"><span class="ml">Z =</span> [1  0 / 0  −1]</div>
+        <div class="grc-transform"><span>|0⟩ → |0⟩</span><br><span>|1⟩ → −|1⟩</span><br>Z² = Identity · HZH = X</div>
+      </div>
+      <div class="grc-actions"><span class="grc-use">Used in: teleportation correction, phase kickback</span><a href="/quantum-circuit.html" class="try-btn">Try →</a></div>
+    </div>
+
+    <div class="gate-ref-card">
+      <div class="grc-head">
+        <div class="gate-symbol" style="border-color:#48dbfb;color:#48dbfb;background:rgba(72,219,251,.1)">S</div>
+        <div class="grc-info">
+          <div class="gate-full-name">S GATE (PHASE)</div>
+          <div class="gate-class">π/2 Phase Gate</div>
+        </div>
+      </div>
+      <div class="grc-body">
+        <div class="grc-desc">Applies a π/2 (90°) phase rotation to |1⟩. S = √Z. Two S gates equal one Z gate. Also called the phase gate P(π/2).</div>
+        <div class="grc-matrix"><span class="ml">S =</span> [1  0 / 0  i]</div>
+        <div class="grc-transform"><span>|0⟩ → |0⟩</span><br><span>|1⟩ → i|1⟩</span><br>S² = Z · S† = S⁻¹</div>
+      </div>
+      <div class="grc-actions"><span class="grc-use">Used in: QFT, T-gate sequences, stabilizer circuits</span><a href="/quantum-circuit.html" class="try-btn">Try →</a></div>
+    </div>
+
+    <div class="gate-ref-card">
+      <div class="grc-head">
+        <div class="gate-symbol" style="border-color:#ff9f43;color:#ff9f43;background:rgba(255,159,67,.1)">T</div>
+        <div class="grc-info">
+          <div class="gate-full-name">T GATE (π/8)</div>
+          <div class="gate-class">π/4 Phase Gate</div>
+        </div>
+      </div>
+      <div class="grc-body">
+        <div class="grc-desc">Applies a π/4 (45°) phase rotation to |1⟩. T = ⁴√Z. Along with H and CNOT, T forms a universal gate set for fault-tolerant quantum computing.</div>
+        <div class="grc-matrix"><span class="ml">T =</span> [1  0 / 0  e^(iπ/4)]</div>
+        <div class="grc-transform"><span>|0⟩ → |0⟩</span><br><span>|1⟩ → e^(iπ/4)|1⟩</span><br>T² = S · T⁸ = Identity</div>
+      </div>
+      <div class="grc-actions"><span class="grc-use">Used in: universal gate sets, Toffoli decomposition</span><a href="/quantum-circuit.html" class="try-btn">Try →</a></div>
+    </div>
+
+  </div>
+
+  <div class="section-head">Multi-Qubit Gates</div>
+
+  <div class="gates-grid">
+
+    <div class="gate-ref-card">
+      <div class="grc-head">
+        <div class="gate-symbol" style="border-color:#a855f7;color:#a855f7;background:rgba(168,85,247,.1);font-size:11px">CX</div>
+        <div class="grc-info">
+          <div class="gate-full-name">CNOT (CX)</div>
+          <div class="gate-class">Controlled-NOT · 2-qubit</div>
+        </div>
+      </div>
+      <div class="grc-body">
+        <div class="grc-desc">Flips the target qubit if and only if the control qubit is |1⟩. The primary entangling gate. H + CNOT creates a Bell state.</div>
+        <div class="grc-matrix"><span class="ml">CNOT =</span> [1 0 0 0 / 0 1 0 0 / 0 0 0 1 / 0 0 1 0]</div>
+        <div class="grc-transform"><span>|00⟩→|00⟩, |01⟩→|01⟩</span><br><span>|10⟩→|11⟩, |11⟩→|10⟩</span></div>
+      </div>
+      <div class="grc-actions"><span class="grc-use">Used in: Bell states, teleportation, all entangling circuits</span><a href="/quantum-circuit.html" class="try-btn">Try →</a></div>
+    </div>
+
+    <div class="gate-ref-card">
+      <div class="grc-head">
+        <div class="gate-symbol" style="border-color:#fd79a8;color:#fd79a8;background:rgba(253,121,168,.1);font-size:11px">CZ</div>
+        <div class="grc-info">
+          <div class="gate-full-name">CONTROLLED-Z</div>
+          <div class="gate-class">Phase Kickback · 2-qubit</div>
+        </div>
+      </div>
+      <div class="grc-body">
+        <div class="grc-desc">Applies a Z (phase flip) to the target qubit only when the control is |1⟩. Unlike CNOT, CZ is symmetric — control and target are interchangeable.</div>
+        <div class="grc-matrix"><span class="ml">CZ =</span> diag(1, 1, 1, −1)</div>
+        <div class="grc-transform"><span>|00⟩→|00⟩, |01⟩→|01⟩</span><br><span>|10⟩→|10⟩, |11⟩→−|11⟩</span></div>
+      </div>
+      <div class="grc-actions"><span class="grc-use">Used in: Grover diffusion, graph state preparation</span><a href="/quantum-circuit.html" class="try-btn">Try →</a></div>
+    </div>
+
+    <div class="gate-ref-card">
+      <div class="grc-head">
+        <div class="gate-symbol" style="border-color:#e8c84a;color:#e8c84a;background:rgba(232,200,74,.1);font-size:11px">SW</div>
+        <div class="grc-info">
+          <div class="gate-full-name">SWAP</div>
+          <div class="gate-class">Exchange Gate · 2-qubit</div>
+        </div>
+      </div>
+      <div class="grc-body">
+        <div class="grc-desc">Exchanges the states of two qubits. Equivalent to three CNOTs. Used in routing qubits that aren't physically adjacent on quantum hardware.</div>
+        <div class="grc-matrix"><span class="ml">SWAP =</span> [1 0 0 0 / 0 0 1 0 / 0 1 0 0 / 0 0 0 1]</div>
+        <div class="grc-transform"><span>|01⟩ → |10⟩</span><br><span>|10⟩ → |01⟩</span><br>SWAP² = Identity</div>
+      </div>
+      <div class="grc-actions"><span class="grc-use">Used in: hardware routing, Fredkin gate, sorting circuits</span><a href="/quantum-circuit.html" class="try-btn">Try →</a></div>
+    </div>
+
+    <div class="gate-ref-card">
+      <div class="grc-head">
+        <div class="gate-symbol" style="border-color:#00ff9d;color:#00ff9d;background:rgba(0,255,157,.1);font-size:11px">TOF</div>
+        <div class="grc-info">
+          <div class="gate-full-name">TOFFOLI (CCX)</div>
+          <div class="gate-class">Controlled-Controlled-NOT · 3-qubit</div>
+        </div>
+      </div>
+      <div class="grc-body">
+        <div class="grc-desc">Flips the target qubit only when both control qubits are |1⟩. The quantum AND gate. Universal for classical reversible computation. Forms a universal quantum gate set with H.</div>
+        <div class="grc-matrix"><span class="ml">CCX: 8×8 identity with</span><br><span class="ml">rows 6,7 swapped</span></div>
+        <div class="grc-transform"><span>|110⟩ → |111⟩</span><br><span>|111⟩ → |110⟩</span><br>All other states unchanged</div>
+      </div>
+      <div class="grc-actions"><span class="grc-use">Used in: arithmetic circuits, error correction, classical simulation</span><a href="/quantum-circuit.html" class="try-btn">Try →</a></div>
+    </div>
+
+  </div>
+
+  <div class="section-head">Measurement</div>
+
+  <div class="gates-grid">
+    <div class="gate-ref-card">
+      <div class="grc-head">
+        <div class="gate-symbol" style="border-color:#00ff9d;color:#00ff9d;background:rgba(0,255,157,.1);font-size:20px">⊛</div>
+        <div class="grc-info">
+          <div class="gate-full-name">MEASUREMENT (M)</div>
+          <div class="gate-class">Non-Unitary Operation</div>
+        </div>
+      </div>
+      <div class="grc-body">
+        <div class="grc-desc">Collapses the qubit from a quantum superposition to a definite classical bit — 0 or 1. Probability of each outcome is the squared magnitude of the corresponding amplitude. Measurement is irreversible.</div>
+        <div class="grc-matrix"><span class="ml">Not a unitary matrix —</span><br><span class="ml">measurement is a projective operation</span></div>
+        <div class="grc-transform"><span>|ψ⟩ = α|0⟩+β|1⟩</span><br><span>→ 0 with prob |α|², 1 with prob |β|²</span></div>
+      </div>
+      <div class="grc-actions"><span class="grc-use">Used in: end of all circuits, mid-circuit in teleportation</span><a href="/quantum-circuit.html" class="try-btn">Try →</a></div>
+    </div>
+  </div>
+
+</div>
+<footer>
+  <a href="/index.html" class="footer-logo">HADAMARD<span>.app</span></a>
+  <div class="footer-copy">© 2026 hadamard.app · Free quantum computing tools</div>
+  <div class="footer-links"><a href="/quantum-circuit.html">Circuit Sim</a><a href="/learn/hadamard-gate.html">H Gate</a><a href="/algorithms.html">All Tools</a></div>
+</footer>
+</body>
+</html>
